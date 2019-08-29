@@ -18,8 +18,8 @@
                 <Separator></Separator>
                 <MenuItem Name="OpenMenuItem" Header="Open..." InputGestureText="Ctrl + O" Click="OpenFile"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Name="SaveMenuItem" Header="Save" InputGestureText="Ctrl + S" Click="SaveFile"></MenuItem>
-                <MenuItem Name="SaveAsMenuItem" Header="Save As..." InputGestureText="Ctrl + Alt + S" Click="SaveFileAs"></MenuItem>
+                <MenuItem Name="SaveMenuItem" Header="Save" InputGestureText="Ctrl + S" Click="SaveFileEvent"></MenuItem>
+                <MenuItem Name="SaveAsMenuItem" Header="Save As..." InputGestureText="Ctrl + Alt + S" Click="SaveFileAsEvent"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="ExitMenuItem" Header="Exit" Click="ExitEditor"></MenuItem>
 
@@ -44,7 +44,7 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ListBox Name="EntriesList" SelectionChanged="EntriesList_SelectionChanged"></ListBox>
+                <ListBox Name="EntriesList" SelectionChanged="EntriesList_SelectionChanged" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
                 <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
                     <Button Name="MoveUpButton" Width="25" Height="25" Margin="0 0 1 0" Content="↑" Click="MoveUpButton_Click"></Button>
                     <Button Name="MoveDownButton" Width="25" Height="25" Margin="0 0 1 0" Content="↓" Click="MoveDownButton_Click"></Button>
@@ -81,6 +81,21 @@
                     <Label Content="Y:" Grid.Column="1"></Label>
                     <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="YNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel"></n:NumericUpDown>
                 </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Content="Center X:"></Label>
+                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Name="CenterXNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256"></n:NumericUpDown>
+                    <Label Content="Center Y:" Grid.Column="1"></Label>
+                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="CenterYNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256"></n:NumericUpDown>
+                </Grid>
+
 
                 <Grid>
                     <Grid.RowDefinitions>
