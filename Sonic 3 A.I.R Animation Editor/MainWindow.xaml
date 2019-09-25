@@ -6,10 +6,11 @@
         xmlns:n="clr-namespace:ControlLib;assembly=NumericUpDown"
         xmlns:local="clr-namespace:Sonic_3_A.I.R_Animation_Editor"
         mc:Ignorable="d"
-        Title="Sonic 3 A.I.R Animation Editor" Height="450" Width="800" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
+        Title="Sonic 3 A.I.R Animation Editor" Height="550" Width="800" MinWidth="800" MinHeight="550" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="400"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Menu>
@@ -17,17 +18,49 @@
                 <MenuItem Name="NewMenuItem" Header="New" InputGestureText="Ctrl + N" Click="OpenFile"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="OpenMenuItem" Header="Open..." InputGestureText="Ctrl + O" Click="OpenFile"></MenuItem>
+                <MenuItem Name="OpenRecentsMenuItem" Header="Open Recent..." SubmenuOpened="OpenRecentsMenuItem_SubmenuOpened">
+                    <MenuItem Name="NoRecentFiles" Header="No Recent Files" IsEnabled="False"></MenuItem>
+                </MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="SaveMenuItem" Header="Save" InputGestureText="Ctrl + S" Click="SaveFileEvent"></MenuItem>
                 <MenuItem Name="SaveAsMenuItem" Header="Save As..." InputGestureText="Ctrl + Alt + S" Click="SaveFileAsEvent"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="UnloadMenuItem" Header="Unload" Click="UnloadMenuItem_Click"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="ExitMenuItem" Header="Exit" Click="ExitEditor"></MenuItem>
 
 
             </MenuItem>
-            <MenuItem Header="Other"></MenuItem>
+            <MenuItem Header="View">
+                <MenuItem Header="Refrence Animations...">
+                    <MenuItem Header="Standard...">
+                        <MenuItem Header="Sonic...">
+                            <MenuItem Header="Sonic (Main)" Name="RefrenceSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                            <MenuItem Header="Sonic (Snowboard)" Name="RefrenceSonicSnowboardButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                            <MenuItem Header="Sonic (Peel Out)"  Name="RefrenceSonicPeelOutButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                            <MenuItem Header="Sonic (Drop Dash)"  Name="RefrenceSonicDropDashButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        </MenuItem>
+
+                        <MenuItem Header="Tails" Name="RefrenceTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Knuckles" Name="RefrenceKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Super Sonic" Name="RefrenceSuperSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Blue Spheres...">
+                        <MenuItem Header="Sonic" Name="RefrenceBSSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Tails" Name="RefrenceBSTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Knuckles" Name="RefrenceBSKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="HUD" Name="RefrenceHUDButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem IsChecked="True" Header="None (Default)" Name="RefrenceNothingButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+
+
+                </MenuItem>
+                <MenuItem IsCheckable="True" Header="Show Frame Border" Name="ShowFrameBorderItem" Checked="ShowFrameBorderItem_Checked" Unchecked="ShowFrameBorderItem_Checked"/>
+                <MenuItem IsEnabled="True" IsCheckable="True" Header="Show Full Image" Name="ShowFullImageItem" Checked="ShowFullImageItem_Checked" Unchecked="ShowFullImageItem_Checked"/>
+                <MenuItem IsCheckable="True" Header="Show Alignment Lines" Name="ShowCenterAlignmentLines" Checked="ShowCenterAlignmentLines_Checked" Unchecked="ShowCenterAlignmentLines_Checked"/>
+            </MenuItem>
         </Menu>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
@@ -39,20 +72,59 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
+            <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ListBox SelectedIndex="{Binding SelectedFrameIndex}" Name="FrameViewer" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="FrameViewer_SelectionChanged">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"></VirtualizingStackPanel>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Image Width="45" Height="45" Source="{Binding FrameImage}" HorizontalAlignment="Center"></Image>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Grid.Row="1">
+                    <Border BorderBrush="Gray" BorderThickness="1" Width="42" Height="30" HorizontalAlignment="Left">
+                        <ScrollBar Grid.Column="1" Orientation="Horizontal" Width="40" Height="28" x:Name="AnimationScroller" ValueChanged="AnimationScroller_ValueChanged" SmallChange="1" Value="2" Maximum="3" Minimum="0"/>
+                    </Border>
+                </StackPanel>
+
+
+
+            </Grid>
             <Grid Grid.Column="0" Grid.RowSpan="4">
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ListBox Name="EntriesList" SelectionChanged="EntriesList_SelectionChanged" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
-                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
-                    <Button Name="MoveUpButton" Width="25" Height="25" Margin="0 0 1 0" Content="↑" Click="MoveUpButton_Click"></Button>
-                    <Button Name="MoveDownButton" Width="25" Height="25" Margin="0 0 1 0" Content="↓" Click="MoveDownButton_Click"></Button>
-                    <Button Name="AddButton" Width="25" Height="25" Margin="0 0 1 0" Content="+" Click="AddButton_Click"></Button>
-                    <Button Name="RemoveButton" Width="25" Height="25" Margin="0 0 1 0" Content="-" Click="RemoveButton_Click"></Button>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                    </Grid.RowDefinitions>
+                </Grid>
+                <ListBox Name="EntriesList" HorizontalContentAlignment="Left" SelectedIndex="{Binding SelectedFrameIndex}" SelectionChanged="EntriesList_SelectionChanged" SelectionMode="Single" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
+                <Button Grid.Row="1" IsEnabled="False"></Button>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
+                    <Button Name="MoveUpButton" Width="30" Height="30" Margin="0 0 0 0" Content="↑" Click="MoveUpButton_Click"></Button>
+                    <Button Name="MoveDownButton" Width="30" Height="30" Margin="0 0 0 0" Content="↓" Click="MoveDownButton_Click"></Button>
+                    <Button Name="AddButton" Width="30" Height="30" Margin="0 0 0 0" Content="+" Click="AddButton_Click"></Button>
+                    <Button Name="RemoveButton" Width="30" Height="30" Margin="0 0 0 0" Content="-" Click="RemoveButton_Click"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
                 </StackPanel>
             </Grid>
-            <StackPanel Grid.Column="3" Grid.RowSpan="4" Margin="5">
+            <StackPanel Grid.Column="3" Grid.RowSpan="3" Margin="5">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
@@ -63,9 +135,9 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label Content="Width:"></Label>
-                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="WidthNUD" Grid.Row="1" ValueChanged="NUD_ValueChanged" Mouse.MouseWheel="NUD_MouseWheel"></n:NumericUpDown>
+                    <n:NumericUpDown IsManipulationEnabled="True" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="WidthNUD" Grid.Row="1" ValueChanged="NUD_ValueChanged" Mouse.MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                     <Label Content="Height:" Grid.Column="1"></Label>
-                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="HeightNUD" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel"></n:NumericUpDown>
+                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="HeightNUD" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -77,9 +149,9 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <Label Content="X:"></Label>
-                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Name="XNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel"></n:NumericUpDown>
+                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Name="XNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                     <Label Content="Y:" Grid.Column="1"></Label>
-                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="YNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel"></n:NumericUpDown>
+                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="YNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -91,9 +163,9 @@
                         <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <Label Content="Center X:"></Label>
-                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Name="CenterXNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256"></n:NumericUpDown>
+                    <n:NumericUpDown HorizontalAlignment="Stretch" Width="Auto" Name="CenterXNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                     <Label Content="Center Y:" Grid.Column="1"></Label>
-                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="CenterYNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256"></n:NumericUpDown>
+                    <n:NumericUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="CenterYNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" MaxValue="256" MinValue="-256" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></n:NumericUpDown>
                 </Grid>
 
 
@@ -103,75 +175,98 @@
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
                     </Grid.RowDefinitions>
                     <Label Content="Name:" Margin="3"></Label>
                     <TextBox Name="NameTextBox" Grid.Row="1" Margin="5" TextChanged="FrameTextBox_TextChanged"></TextBox>
                     <Label Content="File:" Grid.Row="2" Margin="3"></Label>
                     <TextBox Name="FileTextBox" Grid.Row="3" Margin="5" TextChanged="FrameTextBox_TextChanged"></TextBox>
+                    <Label IsEnabled="False" Content="Refrence Image Opacity:" Name="RefrenceOpacityLabel" Grid.Row="5" Margin="3"></Label>
+                    <Slider IsEnabled="False" Grid.Row="6" Maximum="100" Minimum="0" Value="100" Margin="5" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
                 </Grid>
             </StackPanel>
-            <Canvas SnapsToDevicePixels="True" MouseWheel="CanvasView_MouseWheel" Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" Grid.ColumnSpan="1" Focusable="True" x:Name="CanvasView" Margin="0 0 0 0"
+            <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1">
+                <Grid>
+                    <Canvas MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasView" Margin="0 0 0 0"
                         RenderOptions.BitmapScalingMode="NearestNeighbor"
-                        RenderOptions.EdgeMode="Aliased"
                         ClipToBounds="True"
                         Background="#303030">
-                <Image x:Name="CanvasImage" Stretch="None">
-                    <Image.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform x:Name="ImageScale"/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Image.RenderTransform>
-                    <Image.Clip>
-                        <RectangleGeometry x:Name="Geomotry"/>
-                    </Image.Clip>
-                </Image>
+                        <Image UseLayoutRounding="True" x:Name="CanvasImage" Stretch="None" SizeChanged="CanvasImage_SizeChanged" ClipToBounds="True">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="ImageScale"/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                            <Image.Clip>
+                                <RectangleGeometry x:Name="Geomotry"/>
+                            </Image.Clip>
+                        </Image>
+                        <Border Visibility="Visible" BorderBrush="Black" x:Name="BorderMarker" BorderThickness="1"                            
+                            RenderTransformOrigin="0.0,0.0">
+                            <Grid Visibility="Visible" x:Name="BorderMarkerBackground" Opacity="0.5" Background="Transparent">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="ImageSection1"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="ImageSection2"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="ImageSection3"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="ImageSection4"/>
+                            </Grid>
+                        </Border>
+                    </Canvas>
+                    <Canvas Opacity="1.0" MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasRefrenceView" Margin="0 0 0 0"
+                        RenderOptions.BitmapScalingMode="NearestNeighbor"
+                        ClipToBounds="True"
+                        Background="Transparent">
+                        <Image UseLayoutRounding="True" x:Name="CanvasRefrenceImage" Stretch="None" SizeChanged="CanvasImage_SizeChanged" ClipToBounds="True">
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform x:Name="ImageRefrenceScale"/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                            <Image.Clip>
+                                <RectangleGeometry x:Name="RefrenceGeomotry"/>
+                            </Image.Clip>
+                        </Image>
 
-                <Border Visibility="Visible" BorderBrush="Black" x:Name="BorderMarker" BorderThickness="1"                            
-                           Canvas.Left="{Binding SpriteLeft, Mode=OneWay}"
-                           Canvas.Top="{Binding SpriteTop, Mode=OneWay}"
-                           Canvas.Right="{Binding SpriteRight, Mode=OneWay}"
-                           Canvas.Bottom="{Binding SpriteBottom, Mode=OneWay}"
-                            RenderTransformOrigin="0.5,0.5">
-                    <Grid Visibility="Visible" x:Name="BorderMarkerBackground" Opacity="0.5" Background="Transparent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="ImageSection1"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="ImageSection2"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="ImageSection3"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="ImageSection4"/>
+                        <Border Visibility="Visible" BorderBrush="Black" x:Name="RefrenceBorderMarker" BorderThickness="1"                            
+                            RenderTransformOrigin="0.0,0.0">
+                            <Grid Visibility="Visible" x:Name="RefrenceBorderMarkerBackground" Opacity="0.5" Background="Transparent">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="RefrenceImageSection1"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="RefrenceImageSection2"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="RefrenceImageSection3"/>
+                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="RefrenceImageSection4"/>
+                            </Grid>
+                        </Border>
+                    </Canvas>
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="CenterAxis">
+                        <Grid Visibility="Hidden" Height="1" x:Name="AxisX" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="Red"/>
+                        <Grid Visibility="Hidden" Width="1" x:Name="AxisY" VerticalAlignment="Stretch" HorizontalAlignment="Center" Background="Red"/>
                     </Grid>
-                </Border>
-                <Border Visibility="Hidden" BorderBrush="#FFE700FF" x:Name="HitBoxViewer" BorderThickness="1"                            
-                           Canvas.Left="{Binding SpriteLeft, Mode=OneWay}"
-                           Canvas.Top="{Binding SpriteTop, Mode=OneWay}"
-                           Canvas.Right="{Binding SpriteRight, Mode=OneWay}"
-                           Canvas.Bottom="{Binding SpriteBottom, Mode=OneWay}"
-                            RenderTransformOrigin="0.5,0.5">
-                    <Grid Visibility="Hidden" x:Name="HitBoxBackground" Opacity="0.5" Background="#FFE700FF">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="HitboxSection1"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="HitboxSection2"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="HitboxSection3"/>
-                        <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="HitboxSection4"/>
-                    </Grid>
-                </Border>
-            </Canvas>
+                </Grid>
+            </Grid>
         </Grid>
+
     </Grid>
 </Window>
