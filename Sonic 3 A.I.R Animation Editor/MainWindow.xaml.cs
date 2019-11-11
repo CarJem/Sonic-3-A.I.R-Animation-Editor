@@ -28,7 +28,8 @@ namespace Sonic_3_A.I.R_Animation_Editor
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+
+        private string RefrenceFolderPath { get; set; } = "";
 
         public bool ShowFullFrame = false;
         public bool ShowFrameBorder = false;
@@ -41,10 +42,12 @@ namespace Sonic_3_A.I.R_Animation_Editor
         public Sonic3AIRAnim CurrentRefrenceAnimation;
         public Sonic3AIRAnim.Sonic3AIRFrame CurrentRefrenceFrame;
 
-        public BitmapImage CurrentSpriteSheet;
+        public SkiaSharp.SKBitmap CurrentSpriteSheet;
+        public SkiaSharp.SKBitmap CurrentSpriteSheetFrame;
         public string CurrentSpriteSheetName;
 
-        public BitmapImage CurrentRefrenceSpriteSheet;
+        public SkiaSharp.SKBitmap CurrentRefrenceSpriteSheet;
+        public SkiaSharp.SKBitmap CurrentRefrenceSpriteSheetFrame;
         public string CurrentRefrenceSpriteSheetName;
 
         public bool AllowUpdate = true;
@@ -72,6 +75,10 @@ namespace Sonic_3_A.I.R_Animation_Editor
         {
             InitializeComponent();
             UpdateUI();
+
+            //ShowFullImageItem.IsChecked = true;
+            //ShowFrameBorderItem.IsChecked = true;
+
         }
 
         private void UpdateUI()
@@ -84,8 +91,8 @@ namespace Sonic_3_A.I.R_Animation_Editor
             ExitMenuItem.IsEnabled = true;
             UnloadMenuItem.IsEnabled = isAnimationLoaded;
 
-            CanvasImage.Opacity = (isAnimationLoaded ? 1.0 : 0);
-            CanvasRefrenceImage.Opacity = (isAnimationLoaded ? 1.0 : 0);
+            //CanvasImageOpacity = (isAnimationLoaded ? 1.0 : 0);
+            //CanvasRefrenceImageOpacity = (isAnimationLoaded ? 1.0 : 0);
 
             if (isAnimationLoaded)
             {
@@ -227,17 +234,20 @@ namespace Sonic_3_A.I.R_Animation_Editor
 
         public FrameValues UpdateRefrenceValues(bool NewFrame = false)
         {
-            Rect area = GetCOBRAF(CurrentRefrenceFrame.X, CurrentRefrenceFrame.Y, CurrentRefrenceFrame.Width, CurrentRefrenceFrame.Height, CurrentRefrenceSpriteSheet.PixelWidth, CurrentRefrenceSpriteSheet.PixelHeight);
+            int img_width = (CurrentRefrenceSpriteSheet != null ? CurrentRefrenceSpriteSheet.Width : int.MaxValue);
+            int img_height = (CurrentRefrenceSpriteSheet != null ? CurrentRefrenceSpriteSheet.Height : int.MaxValue);
 
-
+            Rect area = GetCOBRAF(CurrentRefrenceFrame.X, CurrentRefrenceFrame.Y, CurrentRefrenceFrame.Width, CurrentRefrenceFrame.Height, img_width, img_height);
             return new FrameValues(CurrentRefrenceFrame.X, CurrentRefrenceFrame.Y, CurrentRefrenceFrame.Width, CurrentRefrenceFrame.Height, CurrentRefrenceFrame.CenterX, CurrentRefrenceFrame.CenterY, area);
         }
 
         public FrameValues UpdateValues(bool NewFrame = false)
         {
+            int img_width = (CurrentSpriteSheet != null ? CurrentSpriteSheet.Width : int.MaxValue);
+            int img_height = (CurrentSpriteSheet != null ? CurrentSpriteSheet.Height : int.MaxValue);
             Rect area;
-            if (!NewFrame) area = GetCOBRAF((int)XNUD.Value, (int)YNUD.Value, (int)WidthNUD.Value, (int)HeightNUD.Value, CurrentSpriteSheet.PixelWidth, CurrentSpriteSheet.PixelHeight);
-            else area = GetCOBRAF(CurrentFrame.X, CurrentFrame.Y, CurrentFrame.Width, CurrentFrame.Height, CurrentSpriteSheet.PixelWidth, CurrentSpriteSheet.PixelHeight);
+            if (!NewFrame) area = GetCOBRAF((int)XNUD.Value, (int)YNUD.Value, (int)WidthNUD.Value, (int)HeightNUD.Value, img_width, img_height);
+            else area = GetCOBRAF(CurrentFrame.X, CurrentFrame.Y, CurrentFrame.Width, CurrentFrame.Height, img_width, img_height);
 
             int x = (int)area.X;
             int y = (int)area.Y;
@@ -292,10 +302,10 @@ namespace Sonic_3_A.I.R_Animation_Editor
             }
 
             //Max Values
-            YNUD.MaxValue = (int)(CurrentSpriteSheet.PixelHeight - area.Height);
-            XNUD.MaxValue = (int)(CurrentSpriteSheet.PixelWidth - area.Width);
-            WidthNUD.MaxValue = (int)(CurrentSpriteSheet.PixelWidth - area.X);
-            HeightNUD.MaxValue = (int)(CurrentSpriteSheet.PixelHeight - area.Y);
+            YNUD.MaxValue = (int)(img_height - area.Height);
+            XNUD.MaxValue = (int)(img_width - area.Width);
+            WidthNUD.MaxValue = (int)(img_width - area.X);
+            HeightNUD.MaxValue = (int)(img_height - area.Y);
 
             return new FrameValues(x, y, width, height, centerX, centerY, area);
         }
@@ -303,7 +313,6 @@ namespace Sonic_3_A.I.R_Animation_Editor
         public void UpdateValues()
         {
             AllowUpdate = false;
-            CanvasImage.Source = null;
             NameTextBox.Text = CurrentFrame.Name;
             FileTextBox.Text = CurrentFrame.File;
 
@@ -325,7 +334,6 @@ namespace Sonic_3_A.I.R_Animation_Editor
         public void VoidValues()
         {
             AllowUpdate = false;
-            CanvasImage.Source = null;
             NameTextBox.Text = "";
             FileTextBox.Text = "";
 
@@ -402,295 +410,202 @@ namespace Sonic_3_A.I.R_Animation_Editor
 
         #endregion
 
-        private void UpdateFrameViewAndValues(bool NewFrame = false)
+        private void UpdateFrameViewAndValues(bool NewFrame = false, bool ZoomChanged = false)
         {
             if (CurrentAnimation != null && CurrentFrame != null)
             {
-                UpdateAxisAlignment();
                 AllowListViewUpdate = false;
                 EntriesList.SelectedIndex = CurrentAnimation.FrameList.IndexOf(CurrentFrame);
                 FrameViewer.SelectedIndex = CurrentAnimation.FrameList.IndexOf(CurrentFrame);
                 AllowListViewUpdate = true;
 
+                UpdateOpacitySlider();
+
                 UpdateFrameImage();
+
                 if (CurrentSpriteSheet != null)
                 {
                     UpdateCanvasView(NewFrame);
-                    UpdateFrameBorder();
-                    UpdateCanvasView();
                 }
                 else UpdateValues();
-
-                if (CurrentRefrenceAnimation != null) CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
-
-                if (CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null)
-                {
-                    if (OpacitySlider.IsEnabled == false) OpacitySlider.IsEnabled = true;
-                    if (RefrenceOpacityLabel.IsEnabled == false) RefrenceOpacityLabel.IsEnabled = true;
-
-                    CanvasRefrenceImage.Opacity = RefrenceOpacity;
-                    UpdateRefrenceFrameImage();
-                    if (CurrentRefrenceSpriteSheet != null)
-                    {
-                        UpdateRefrenceCanvasView(NewFrame);
-                        UpdateRefrenceFrameBorder();
-                        UpdateRefrenceCanvasView();
-                    }
-                }
-                else
-                {
-                    CanvasRefrenceImage.Opacity = 0.0;
-                    OpacitySlider.IsEnabled = false;
-                    RefrenceOpacityLabel.IsEnabled = false;
-                }
-
-
-
             }
             else VoidValues();
 
         }
 
-        public void UpdateAxisAlignment()
+        private void UpdateOpacitySlider()
         {
-            if (ShowAlignmentLines)
-            {
-                AxisX.Visibility = Visibility.Visible;
-                AxisY.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                AxisX.Visibility = Visibility.Hidden;
-                AxisY.Visibility = Visibility.Hidden;
-            }
-        }
+            if (CurrentRefrenceAnimation != null) CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
 
-        public Rect GetFrame(int x, int y, int width, int height, double spritesheetWidth, double spritesheetHeight)
-        {
-            if (ShowFullFrame)
+            if (CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null)
             {
-                return new Rect(0, 0, (int)spritesheetWidth, (int)spritesheetHeight);
+                if (OpacitySlider.IsEnabled == false) OpacitySlider.IsEnabled = true;
+                if (RefrenceOpacityLabel.IsEnabled == false) RefrenceOpacityLabel.IsEnabled = true;
+
             }
             else
             {
-                return new Rect(x, y, width, height);
+                OpacitySlider.IsEnabled = false;
+                RefrenceOpacityLabel.IsEnabled = false;
             }
         }
 
         public void UpdateCanvasView(bool NewFrame = false)
         {
-            FrameValues values = UpdateValues(NewFrame);
+            if (CurrentAnimation != null && CurrentFrame != null) Draw();
+            if (CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null && CurrentRefrenceSpriteSheet != null) DrawRefrence();
 
-            //Update Image Display and Crop the Image
-            if (values.Width != 0 && values.Height != 0)
+
+
+            CanvasView.InvalidateVisual();
+
+
+            void Draw()
             {
-
-                Geomotry.Rect = GetFrame(values.X, values.Y, values.Width, values.Height, CurrentSpriteSheet.Width, CurrentSpriteSheet.Height);
-
-                CanvasImage.Source = CurrentSpriteSheet;
-                ImageScale.ScaleX = Zoom;
-                ImageScale.ScaleY = Zoom;
-                CanvasImage.RenderTransformOrigin = new Point(0, 0);
-
-                double left = GetImageViewLeft(CanvasView.ActualWidth, (int)CurrentFrame.X, -(int)(CurrentFrame.CenterX), (int)CurrentFrame.Width, Zoom);
-                double top = GetImageViewTop(CanvasView.ActualHeight, (int)CurrentFrame.Y, -(int)(CurrentFrame.CenterY), (int)CurrentFrame.Height, Zoom);
-                double right = GetImageViewRight(left, CurrentFrame.Width, Zoom);
-                double bottom = GetImageViewBottom(top, CurrentFrame.Height, Zoom);
-
-
-                System.Windows.Controls.Canvas.SetLeft(CanvasImage, left);
-                System.Windows.Controls.Canvas.SetTop(CanvasImage, top);
-                System.Windows.Controls.Canvas.SetRight(CanvasImage, right);
-                System.Windows.Controls.Canvas.SetBottom(CanvasImage, bottom);
-
-
-
-            }
-            else CanvasImage.Source = null;
-        }
-
-
-
-        public void UpdateRefrenceCanvasView(bool NewFrame = false)
-        {
-            FrameValues values = UpdateRefrenceValues(NewFrame);
-
-            //Update Image Display and Crop the Image
-            if (values.Width != 0 && values.Height != 0)
-            {
-                RefrenceGeomotry.Rect = GetFrame(values.X, values.Y, values.Width, values.Height, CurrentRefrenceSpriteSheet.Width, CurrentRefrenceSpriteSheet.Height);
-
-                CanvasRefrenceImage.Source = CurrentRefrenceSpriteSheet;
-                ImageRefrenceScale.ScaleX = Zoom;
-                ImageRefrenceScale.ScaleY = Zoom;
-                CanvasRefrenceImage.RenderTransformOrigin = new Point(0, 0);
-
-                double left = GetImageViewLeft(CanvasRefrenceView.ActualWidth, (int)(CurrentRefrenceFrame.X), -(int)(CurrentRefrenceFrame.CenterX), (int)CurrentRefrenceFrame.Width, Zoom);
-                double top = GetImageViewTop(CanvasRefrenceView.ActualHeight, (int)(CurrentRefrenceFrame.Y), -(int)(CurrentRefrenceFrame.CenterY), (int)CurrentRefrenceFrame.Height, Zoom);
-                double right = GetImageViewRight(left, CurrentRefrenceFrame.Width, Zoom);
-                double bottom = GetImageViewBottom(top, CurrentRefrenceFrame.Height, Zoom);
-
-
-                System.Windows.Controls.Canvas.SetLeft(CanvasRefrenceImage, left);
-                System.Windows.Controls.Canvas.SetTop(CanvasRefrenceImage, top);
-                System.Windows.Controls.Canvas.SetRight(CanvasRefrenceImage, right);
-                System.Windows.Controls.Canvas.SetBottom(CanvasRefrenceImage, bottom);
-
-
-
-            }
-            else CanvasImage.Source = null;
-        }
-
-        private double GetFullImageXOffset(CroppedBitmap cropped)
-        {
-            //return CurrentFrame.X;
-            //return -(int)(CurrentFrame.X + CurrentFrame.CenterX);
-            //return 0;
-            return -(CurrentFrame.X + CurrentFrame.CenterX);
-        }
-
-        private double GetFullImageYOffset(CroppedBitmap cropped)
-        {
-            //return CurrentFrame.Y;
-            //return -(int)(CurrentFrame.Y + CurrentFrame.CenterY);
-            //return 0;
-            return -(CurrentFrame.Y + CurrentFrame.CenterY);
-        }
-
-        public void UpdateRefrenceFrameBorder()
-        {
-            if (ShowFrameBorder)
-            {
-                RefrenceBorderMarker.BorderBrush = new SolidColorBrush(Colors.Red);
-                RefrenceBorderMarker.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                RefrenceBorderMarker.BorderBrush = new SolidColorBrush(Colors.Transparent);
-                RefrenceBorderMarker.Visibility = Visibility.Hidden;
-            }
-            System.Windows.Controls.Canvas.SetLeft(RefrenceBorderMarker, GetBorderLeft(CanvasView.ActualWidth, -CurrentFrame.CenterX));
-            System.Windows.Controls.Canvas.SetTop(RefrenceBorderMarker, GetBorderTop(CanvasView.ActualHeight, -CurrentFrame.CenterY));
-
-            RefrenceBorderMarker.RenderTransformOrigin = new Point(0.0, 0.0);
-
-            double width = CurrentRefrenceFrame.Width;
-            double height = CurrentRefrenceFrame.Height;
-
-            RefrenceBorderMarker.BorderThickness = new Thickness(1);
-
-            RefrenceBorderMarker.Width = (width) * Zoom;
-            RefrenceBorderMarker.Height = (height) * Zoom;
-        }
-
-        public void UpdateFrameBorder()
-        {
-            if (ShowFrameBorder)
-            {
-                BorderMarker.BorderBrush = new SolidColorBrush(Colors.Red);
-                BorderMarker.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                BorderMarker.BorderBrush = new SolidColorBrush(Colors.Transparent);
-                BorderMarker.Visibility = Visibility.Hidden;
-            }
-            System.Windows.Controls.Canvas.SetLeft(BorderMarker, GetBorderLeft(CanvasView.ActualWidth, -CurrentFrame.CenterX));
-            System.Windows.Controls.Canvas.SetTop(BorderMarker, GetBorderTop(CanvasView.ActualHeight, -CurrentFrame.CenterY));
-
-            BorderMarker.RenderTransformOrigin = new Point(0.0, 0.0);
-
-            double width = CurrentFrame.Width;
-            double height = CurrentFrame.Height;
-
-            BorderMarker.BorderThickness = new Thickness(1);
-
-            BorderMarker.Width = (width) * Zoom;
-            BorderMarker.Height = (height) * Zoom;    
-        }
-
-        #region Get Border View Canvas Positions
-
-        public double GetBorderTop(double ViewHeight, int FrameCenterY)
-        {
-            double Center = ViewHeight / 2.0;
-            return (int)((Center) + FrameCenterY * Zoom);
-        }
-
-        public double GetBorderLeft(double ViewWidth, int FrameCenterX)
-        {
-            double Center = ViewWidth / 2.0;
-            return (int)((Center) + FrameCenterX * Zoom);
-        }
-
-        #endregion
-        
-
-        private void UpdateRefrenceFrameImage()
-        {
-            if (CurrentRefrenceSpriteSheetName != CurrentRefrenceFrame.File)
-            {
-                CurrentRefrenceSpriteSheet = null;
-                CurrentRefrenceSpriteSheetName = "";
-                try
+                FrameValues values = UpdateValues(NewFrame);
+                if (values.Width != 0 && values.Height != 0)
                 {
-                    if (File.Exists($"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}"))
-                    {
-                        string fileName = $"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}";
-                        FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                        System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
-                        fileStream.Close();
-                        var color = img.Palette.Entries[0];
-                        string hex = HexConverter(color);
-                        img.MakeTransparent(color);
-                        CurrentRefrenceSpriteSheet = (BitmapImage)BitmapConversion.ToWpfBitmap(img);
-                        CurrentRefrenceSpriteSheetName = CurrentRefrenceFrame.File;
-                    }
-                    else
-                    {
-                        CurrentRefrenceSpriteSheet = null;
-                    }
+                    System.Drawing.Bitmap sourceImage = SkiaSharp.Views.Desktop.Extensions.ToBitmap(CurrentSpriteSheet);
+                    System.Drawing.Bitmap croppedImg = (System.Drawing.Bitmap)BitmapExtensions.CropImage(sourceImage, new System.Drawing.Rectangle(values.X, values.Y, values.Width, values.Height));
+                    BitmapImage croppedBitmapImage = (BitmapImage)BitmapExtensions.ToWpfBitmap(croppedImg);
+                    CurrentSpriteSheetFrame = SkiaSharp.Views.WPF.WPFExtensions.ToSKBitmap(croppedBitmapImage);
 
+                    sourceImage.Dispose();
+                    sourceImage = null;
+
+                    croppedImg.Dispose();
+                    croppedImg = null;
                 }
-                catch
+
+
+
+            }
+
+            void DrawRefrence()
+            {
+                FrameValues refValues = UpdateRefrenceValues(NewFrame);
+                if (refValues.Width != 0 && refValues.Height != 0 && CurrentRefrenceSpriteSheet != null)
                 {
+                    System.Drawing.Bitmap sourceImage = SkiaSharp.Views.Desktop.Extensions.ToBitmap(CurrentRefrenceSpriteSheet);
+                    System.Drawing.Bitmap croppedImg = (System.Drawing.Bitmap)BitmapExtensions.CropImage(sourceImage, new System.Drawing.Rectangle(refValues.X, refValues.Y, refValues.Width, refValues.Height));
+                    BitmapImage croppedBitmapImage = (BitmapImage)BitmapExtensions.ToWpfBitmap(croppedImg);
+                    CurrentRefrenceSpriteSheetFrame = SkiaSharp.Views.WPF.WPFExtensions.ToSKBitmap(croppedBitmapImage);
+
+                    sourceImage.Dispose();
+                    sourceImage = null;
+
+                    croppedImg.Dispose();
+                    croppedImg = null;
+                }
+            }
+
+
+        }
+
+        private void UpdateFrameImage()
+        {
+            MainImage();
+            if (CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null) RefrenceImage();
+
+            void MainImage()
+            {
+                if (CurrentSpriteSheetName != CurrentFrame.File)
+                {
+                    Dispose();
+                    CurrentSpriteSheetName = "";
+                    try
+                    {
+                        if (File.Exists($"{CurrentAnimation.Directory}\\{CurrentFrame.File}"))
+                        {
+                            string fileName = $"{CurrentAnimation.Directory}\\{CurrentFrame.File}";
+                            FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                            System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
+                            fileStream.Close();
+                            if (img.Palette.Entries.Length > 0)
+                            {
+                                var color = img.Palette.Entries[0];
+                                string hex = HexConverter(color);
+                                img.MakeTransparent(color);
+                            }
+
+                            BitmapImage bitmapImage = (BitmapImage)BitmapExtensions.ToWpfBitmap(img);
+                            CurrentSpriteSheet = SkiaSharp.Views.WPF.WPFExtensions.ToSKBitmap(bitmapImage);
+
+                            CurrentSpriteSheetName = CurrentFrame.File;
+
+                            img.Dispose();
+                            img = null;
+
+                        }
+                        else
+                        {
+                            Dispose();
+                        }
+
+                    }
+                    catch
+                    {
+                        Dispose();
+                    }
+                }
+
+                void Dispose()
+                {
+                    if (CurrentSpriteSheet != null) CurrentSpriteSheet.Dispose();
+                    CurrentSpriteSheet = null;
+                }
+            }
+            void RefrenceImage()
+            {
+                if (CurrentRefrenceSpriteSheetName != CurrentRefrenceFrame.File)
+                {
+                    Dispose();
+                    CurrentRefrenceSpriteSheetName = "";
+                    try
+                    {
+                        if (File.Exists($"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}"))
+                        {
+                            string fileName = $"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}";
+                            FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                            System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
+                            fileStream.Close();
+                            if (img.Palette.Entries.Length > 0)
+                            {
+                                var color = img.Palette.Entries[0];
+                                string hex = HexConverter(color);
+                                img.MakeTransparent(color);
+                            }
+
+                            //img = (System.Drawing.Bitmap)BitmapExtensions.SetImageOpacity(img, (float)OpacitySlider.Value);
+
+                            BitmapImage bitmapImage = (BitmapImage)BitmapExtensions.ToWpfBitmap(img);
+                            CurrentRefrenceSpriteSheet = SkiaSharp.Views.WPF.WPFExtensions.ToSKBitmap(bitmapImage);
+
+                            CurrentRefrenceSpriteSheetName = CurrentRefrenceFrame.File;
+
+                            img.Dispose();
+                            img = null;
+
+                        }
+                        else
+                        {
+                            Dispose();
+                        }
+
+                    }
+                    catch
+                    {
+                        Dispose();
+                    }
+                }
+
+                void Dispose()
+                {
+                    if (CurrentRefrenceSpriteSheet != null) CurrentRefrenceSpriteSheet.Dispose();
                     CurrentRefrenceSpriteSheet = null;
                 }
             }
 
-        }
-        private void UpdateFrameImage()
-        {
-            if (CurrentSpriteSheetName != CurrentFrame.File)
-            {
-                CurrentSpriteSheet = null;
-                CurrentSpriteSheetName = "";
-                try
-                {
-                    if (File.Exists($"{CurrentAnimation.Directory}\\{CurrentFrame.File}"))
-                    {
-                        string fileName = $"{CurrentAnimation.Directory}\\{CurrentFrame.File}";
-                        FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                        System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
-                        fileStream.Close();
-                        var color = img.Palette.Entries[0];
-                        string hex = HexConverter(color);
-                        img.MakeTransparent(color);
-                        CurrentSpriteSheet = (BitmapImage)BitmapConversion.ToWpfBitmap(img);
-                        CurrentSpriteSheetName = CurrentFrame.File;
-                    }
-                    else
-                    {
-                        CurrentSpriteSheet = null;
-                    }
-
-                }
-                catch
-                {
-                    CurrentSpriteSheet = null;
-                }
-            }
 
 
         }
@@ -699,48 +614,6 @@ namespace Sonic_3_A.I.R_Animation_Editor
         {
             return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
         }
-
-        #region Get Image View Canvas Positions
-
-        private double GetImageViewTop(double ViewHeight, double? SelectedFrameTop, double? SelectedFramePivotY, int? SelectedFrameHeight, double Zoom)
-        {
-            double Center = ViewHeight / 2.0;
-            double FrameTop = SelectedFrameTop ?? 0;
-            double FrameCenterY = SelectedFramePivotY ?? 0;
-            return (Center - FrameTop * Zoom) + FrameCenterY * Zoom;
-        }
-
-        private double GetImageViewLeft(double ViewWidth, double? SelectedFrameLeft, double? SelectedFramePivotX, int? SelectedFrameWidth, double Zoom)
-        {
-            double Center = ViewWidth / 2.0;
-            double FrameLeft = SelectedFrameLeft ?? 0;
-            double FrameCenterX = SelectedFramePivotX ?? 0;
-            return (Center - FrameLeft * Zoom) + FrameCenterX * Zoom;
-        }
-
-        public double GetImageViewRight(double SpriteLeft, int? SelectedFrameWidth, double Zoom)
-        {
-            if (ShowFullFrame) return 0;
-            else
-            {
-                double FrameWidth = SelectedFrameWidth ?? 0;
-                return (SpriteLeft + FrameWidth * Zoom);
-            }
-
-        }
-
-        public double GetImageViewBottom(double SpriteTop, int? SelectedFrameHeight, double Zoom)
-        {
-            if (ShowFullFrame) return 0;
-            else
-            {
-                double FrameHeight = SelectedFrameHeight ?? 0;
-                return (SpriteTop + FrameHeight * Zoom);
-            }
-
-        }
-
-        #endregion
 
         #endregion
 
@@ -789,7 +662,6 @@ namespace Sonic_3_A.I.R_Animation_Editor
                 UpdateUI();
             }
         }
-
         private void NUD_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             ControlLib.NumericUpDown objSend = (sender as ControlLib.NumericUpDown);
@@ -805,24 +677,24 @@ namespace Sonic_3_A.I.R_Animation_Editor
                 }
             }
         }
-
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateFrameViewAndValues();
         }
-
         private void CanvasView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta >= 1)
             {
-                Zoom += 1;
+                if (Zoom <= 5) Zoom += 1;
+
             }
             else if (e.Delta <= -1)
             {
                 if (Zoom >= 2) Zoom -= 1;
-
             }
-            UpdateFrameViewAndValues();
+
+
+            UpdateFrameViewAndValues(false, true);
         }
 
         #endregion
@@ -948,8 +820,10 @@ namespace Sonic_3_A.I.R_Animation_Editor
                 {
                     BitmapSource bitmap = BitmapSource.Create(1, 1, 96, 96, PixelFormats.Bgr24, null, new byte[3] { 0, 0, 0 }, 3);
                     BitmapImage img = new BitmapImage();
+                    string path = $"{Directory}\\{File}";
+
                     img.BeginInit();
-                    img.UriSource = new Uri($"{Directory}\\{File}");
+                    img.UriSource = new Uri(path);
                     img.EndInit();
 
                     if (Width > 0 && Height > 0 && img != null)
@@ -969,6 +843,8 @@ namespace Sonic_3_A.I.R_Animation_Editor
                         {
                         }
                     }
+
+
 
                     ImageSource result = bitmap;
                     return result;
@@ -1287,7 +1163,7 @@ namespace Sonic_3_A.I.R_Animation_Editor
 
         private void RefrenceAnimationButton_Click(object sender, RoutedEventArgs e)
         {
-            string refrencePath = @"D:\Users\Cwall\AppData\Roaming\Sonic3AIR_MM\air_versions\19.09.19.0\sonic3air_game\doc\modding\sprites\";
+
             string item = "";
             if (sender.Equals(RefrenceSonicButton)) item = "character_sonic.json";
             else if (sender.Equals(RefrenceSonicSnowboardButton)) item = "character_sonic_snowboarding.json";
@@ -1311,7 +1187,7 @@ namespace Sonic_3_A.I.R_Animation_Editor
             }
             else
             {
-                string result = System.IO.Path.Combine(refrencePath, item);
+                string result = System.IO.Path.Combine(RefrenceFolderPath, item);
 
                 if (File.Exists(result)) CurrentRefrenceAnimation = new Sonic3AIRAnim(new FileInfo(result));
 
@@ -1319,6 +1195,7 @@ namespace Sonic_3_A.I.R_Animation_Editor
             }
 
             UpdateRefrenceCheckBoxes(sender);
+            CanvasView.InvalidateVisual();
 
 
         }
@@ -1326,7 +1203,7 @@ namespace Sonic_3_A.I.R_Animation_Editor
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             RefrenceOpacity = OpacitySlider.Value;
-            if (CanvasRefrenceImage != null) CanvasRefrenceImage.Opacity = RefrenceOpacity;
+            if (CanvasView != null) CanvasView.InvalidateVisual();
         }
 
         private void UnloadMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1338,6 +1215,230 @@ namespace Sonic_3_A.I.R_Animation_Editor
             EntriesList.ItemsSource = null;
             UpdateUI();
 
+        }
+
+        private void CanvasView_PaintSurface(object sender, SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs e)
+        {      
+            if (CurrentSpriteSheet != null || CurrentSpriteSheetFrame != null)
+            {
+
+                var info = e.Info;
+                var canvas = e.Surface.Canvas;
+
+                canvas.Scale(Zoom);
+
+                float width = info.Width / Zoom;
+                float height = info.Height / Zoom;
+
+                float width_half = (info.Width / 2) / Zoom;
+                float height_half = (info.Height / 2) / Zoom;
+
+                canvas.Clear(SkiaSharp.SKColors.Transparent);
+
+                DrawSprite(canvas, width_half, height_half, width, height);
+                if (CurrentRefrenceSpriteSheet != null && CurrentRefrenceSpriteSheetFrame != null && CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null) DrawRefrenceSprite(canvas, width_half, height_half, width, height);
+            }
+        }
+
+
+        private void DrawSprite(SkiaSharp.SKCanvas canvas, float width_half, float height_half, float width, float height)
+        {
+            int frame_x = (int)XNUD.Value;
+            int frame_y = (int)YNUD.Value;
+
+            int frame_center_x = (int)CenterXNUD.Value;
+            int frame_center_y = (int)CenterYNUD.Value;
+
+            int frame_width = (int)WidthNUD.Value;
+            int frame_height = (int)HeightNUD.Value;
+
+
+            float img_center_x = width_half - frame_center_x;
+            float img_center_y = height_half - frame_center_y;
+
+            float img_full_center_x = width_half - frame_x - frame_center_x;
+            float img_full_center_y = height_half - frame_y - frame_center_y;
+
+            float img_full_border_center_x = width_half - frame_center_x;
+            float img_full_border_center_y = height_half - frame_center_y;
+
+            float x;
+            float y;
+            float w;
+            float h;
+
+            float bx;
+            float by;
+            float bw;
+            float bh;
+
+            if (ShowFullFrame)
+            {
+                x = img_full_center_x;
+                y = img_full_center_y;
+                w = frame_width;
+                h = frame_height;
+
+                bx = img_full_border_center_x - 1;
+                by = img_full_border_center_y - 1;
+                bw = w + 1;
+                bh = h + 1;
+            }
+            else
+            {
+                x = img_center_x;
+                y = img_center_y;
+                w = frame_width;
+                h = frame_height;
+
+                bx = x - 1;
+                by = y - 1;
+                bw = w + 1;
+                bh = h + 1;
+            }
+
+            canvas.DrawBitmap((ShowFullFrame ? CurrentSpriteSheet : CurrentSpriteSheetFrame), new SkiaSharp.SKPoint(x, y));
+
+            if (ShowFrameBorder)
+            {
+                SkiaSharp.SKPoint x1 = new SkiaSharp.SKPoint(bx, by);
+                SkiaSharp.SKPoint x2 = new SkiaSharp.SKPoint(bx + bw, by);
+                SkiaSharp.SKPoint y1 = new SkiaSharp.SKPoint(bx, by + bh);
+                SkiaSharp.SKPoint y2 = new SkiaSharp.SKPoint(bx + bw, by + bh);
+
+                canvas.DrawLine(x1, x2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                canvas.DrawLine(y1, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                canvas.DrawLine(x1, y1, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                canvas.DrawLine(x2, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+            }
+
+            if (ShowAlignmentLines)
+            {
+                SkiaSharp.SKPoint x1 = new SkiaSharp.SKPoint(0, height_half);
+                SkiaSharp.SKPoint y1 = new SkiaSharp.SKPoint(width, height_half);
+                SkiaSharp.SKPoint x2 = new SkiaSharp.SKPoint(width_half, 0);
+                SkiaSharp.SKPoint y2 = new SkiaSharp.SKPoint(width_half, height);
+
+
+
+                canvas.DrawLine(x1, y1, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Red });
+                canvas.DrawLine(x2, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Red });
+            }
+        }
+        private void DrawRefrenceSprite(SkiaSharp.SKCanvas canvas, float width_half, float height_half, float width, float height)
+        {
+            int frame_x = CurrentRefrenceFrame.X;
+            int frame_y = CurrentRefrenceFrame.Y;
+
+            int frame_center_x = CurrentRefrenceFrame.CenterX;
+            int frame_center_y = CurrentRefrenceFrame.CenterY;
+
+            int frame_width = CurrentRefrenceFrame.Width;
+            int frame_height = CurrentRefrenceFrame.Height;
+
+
+            float img_center_x = width_half - frame_center_x;
+            float img_center_y = height_half - frame_center_y;
+
+            float img_full_center_x = width_half - frame_x - frame_center_x;
+            float img_full_center_y = height_half - frame_y - frame_center_y;
+
+            float img_full_border_center_x = width_half - frame_center_x;
+            float img_full_border_center_y = height_half - frame_center_y;
+
+            float x;
+            float y;
+            float w;
+            float h;
+
+            float bx;
+            float by;
+            float bw;
+            float bh;
+
+            if (ShowFullFrame)
+            {
+                x = img_full_center_x;
+                y = img_full_center_y;
+                w = frame_width;
+                h = frame_height;
+
+                bx = img_full_border_center_x - 1;
+                by = img_full_border_center_y - 1;
+                bw = w + 1;
+                bh = h + 1;
+            }
+            else
+            {
+                x = img_center_x;
+                y = img_center_y;
+                w = frame_width;
+                h = frame_height;
+
+                bx = x - 1;
+                by = y - 1;
+                bw = w + 1;
+                bh = h + 1;
+            }
+
+            SkiaSharp.SKPaint paint = new SkiaSharp.SKPaint();
+
+            using (var cf = SkiaSharp.SKColorFilter.CreateBlendMode(SkiaSharp.SKColors.White, SkiaSharp.SKBlendMode.DstIn))
+            {
+                byte value = (byte)(OpacitySlider.Value * 2.56);
+
+                var transparency = SkiaSharp.SKColors.White.WithAlpha(value); // 127 => 50%
+                paint.ColorFilter = cf;
+                paint.Color = transparency;
+
+                canvas.DrawBitmap((ShowFullFrame ? CurrentRefrenceSpriteSheet : CurrentRefrenceSpriteSheetFrame), new SkiaSharp.SKPoint(x, y), paint);
+
+                if (ShowFrameBorder)
+                {
+                    SkiaSharp.SKPoint x1 = new SkiaSharp.SKPoint(bx, by);
+                    SkiaSharp.SKPoint x2 = new SkiaSharp.SKPoint(bx + bw, by);
+                    SkiaSharp.SKPoint y1 = new SkiaSharp.SKPoint(bx, by + bh);
+                    SkiaSharp.SKPoint y2 = new SkiaSharp.SKPoint(bx + bw, by + bh);
+
+                    canvas.DrawLine(x1, x2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                    canvas.DrawLine(y1, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                    canvas.DrawLine(x1, y1, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                    canvas.DrawLine(x2, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Black });
+                }
+
+                if (ShowAlignmentLines)
+                {
+                    SkiaSharp.SKPoint x1 = new SkiaSharp.SKPoint(0, height_half);
+                    SkiaSharp.SKPoint y1 = new SkiaSharp.SKPoint(width, height_half);
+                    SkiaSharp.SKPoint x2 = new SkiaSharp.SKPoint(width_half, 0);
+                    SkiaSharp.SKPoint y2 = new SkiaSharp.SKPoint(width_half, height);
+
+
+
+                    canvas.DrawLine(x1, y1, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Red });
+                    canvas.DrawLine(x2, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.SKColors.Red });
+                }
+
+                paint.ColorFilter = null;
+
+            }
+
+
+        }
+
+        private void SetRefrenecFolderPath_Click(object sender, RoutedEventArgs e)
+        {
+            string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string ModManagerVersionsPath = System.IO.Path.Combine(appdata, @"Sonic3AIR_MM\air_versions");
+            using (var fldrDlg = new FolderSelectDialog())
+            {
+                fldrDlg.Title = "Set Refrence Folder Path...";
+                fldrDlg.InitialDirectory = ModManagerVersionsPath;
+                if (fldrDlg.ShowDialog() == true)
+                {
+                    RefrenceFolderPath = fldrDlg.FileName;
+                }
+            }
         }
     }
 

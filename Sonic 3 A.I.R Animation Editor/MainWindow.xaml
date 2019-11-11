@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:n="clr-namespace:ControlLib;assembly=NumericUpDown"
+        xmlns:render="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         xmlns:local="clr-namespace:Sonic_3_A.I.R_Animation_Editor"
         mc:Ignorable="d"
         Title="Sonic 3 A.I.R Animation Editor" Height="550" Width="800" MinWidth="800" MinHeight="550" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
@@ -52,6 +53,10 @@
                     </MenuItem>
                     <MenuItem Header="HUD" Name="RefrenceHUDButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                     <MenuItem IsChecked="True" Header="None (Default)" Name="RefrenceNothingButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <Separator></Separator>
+                    <MenuItem Header="Set Refrence Folder Path..." Name="SetRefrenecFolderPath" Click="SetRefrenecFolderPath_Click"></MenuItem>
+                    <Separator></Separator>
+                    <MenuItem IsEnabled="False" Header="Default Location in A.I.R. Install: &#10;(sonic3air__game\doc\modding\sprites)"></MenuItem>
 
 
                 </MenuItem>
@@ -184,86 +189,19 @@
                     <Label Content="File:" Grid.Row="2" Margin="3"></Label>
                     <TextBox Name="FileTextBox" Grid.Row="3" Margin="5" TextChanged="FrameTextBox_TextChanged"></TextBox>
                     <Label IsEnabled="False" Content="Refrence Image Opacity:" Name="RefrenceOpacityLabel" Grid.Row="5" Margin="3"></Label>
-                    <Slider IsEnabled="False" Grid.Row="6" Maximum="100" Minimum="0" Value="100" Margin="5" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
+                    <Slider IsEnabled="False" Grid.Row="6" Maximum="99" Minimum="0" Value="100" Margin="5" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
                 </Grid>
             </StackPanel>
-            <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1">
-                <Grid>
-                    <Canvas MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasView" Margin="0 0 0 0"
+            <Grid Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1" MouseWheel="CanvasView_MouseWheel">
+                <Grid Background="#303030" MouseWheel="CanvasView_MouseWheel">
+                    <render:SKElement VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PaintSurface="CanvasView_PaintSurface" MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasView" Margin="0 0 0 0"
                         RenderOptions.BitmapScalingMode="NearestNeighbor"
-                        ClipToBounds="True"
-                        Background="#303030">
-                        <Image UseLayoutRounding="True" x:Name="CanvasImage" Stretch="None" SizeChanged="CanvasImage_SizeChanged" ClipToBounds="True">
-                            <Image.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform x:Name="ImageScale"/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </Image.RenderTransform>
-                            <Image.Clip>
-                                <RectangleGeometry x:Name="Geomotry"/>
-                            </Image.Clip>
-                        </Image>
-                        <Border Visibility="Visible" BorderBrush="Black" x:Name="BorderMarker" BorderThickness="1"                            
-                            RenderTransformOrigin="0.0,0.0">
-                            <Grid Visibility="Visible" x:Name="BorderMarkerBackground" Opacity="0.5" Background="Transparent">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="ImageSection1"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="ImageSection2"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="ImageSection3"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="ImageSection4"/>
-                            </Grid>
-                        </Border>
-                    </Canvas>
-                    <Canvas Opacity="1.0" MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasRefrenceView" Margin="0 0 0 0"
+                        ClipToBounds="True">
+                    </render:SKElement>
+                    <render:SKElement VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Opacity="1.0" MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasRefrenceView" Margin="0 0 0 0"
                         RenderOptions.BitmapScalingMode="NearestNeighbor"
-                        ClipToBounds="True"
-                        Background="Transparent">
-                        <Image UseLayoutRounding="True" x:Name="CanvasRefrenceImage" Stretch="None" SizeChanged="CanvasImage_SizeChanged" ClipToBounds="True">
-                            <Image.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform x:Name="ImageRefrenceScale"/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </Image.RenderTransform>
-                            <Image.Clip>
-                                <RectangleGeometry x:Name="RefrenceGeomotry"/>
-                            </Image.Clip>
-                        </Image>
-
-                        <Border Visibility="Visible" BorderBrush="Black" x:Name="RefrenceBorderMarker" BorderThickness="1"                            
-                            RenderTransformOrigin="0.0,0.0">
-                            <Grid Visibility="Visible" x:Name="RefrenceBorderMarkerBackground" Opacity="0.5" Background="Transparent">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="0" x:Name="RefrenceImageSection1"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="0" Grid.Column="1" x:Name="RefrenceImageSection2"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="0" x:Name="RefrenceImageSection3"/>
-                                <Grid Background="Black" Opacity="0.1" Grid.Row="1" Grid.Column="1" x:Name="RefrenceImageSection4"/>
-                            </Grid>
-                        </Border>
-                    </Canvas>
-                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="CenterAxis">
-                        <Grid Visibility="Hidden" Height="1" x:Name="AxisX" VerticalAlignment="Center" HorizontalAlignment="Stretch" Background="Red"/>
-                        <Grid Visibility="Hidden" Width="1" x:Name="AxisY" VerticalAlignment="Stretch" HorizontalAlignment="Center" Background="Red"/>
-                    </Grid>
+                        ClipToBounds="True">
+                    </render:SKElement>
                 </Grid>
             </Grid>
         </Grid>
