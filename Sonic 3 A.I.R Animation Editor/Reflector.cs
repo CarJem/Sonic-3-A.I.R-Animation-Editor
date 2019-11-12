@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Sonic_3_A.I.R_Animation_Editor
+namespace Sonic_3_AIR_Animation_Editor
 {
     /// <summary>
     /// This class is from the Front-End for Dosbox and is used to present a 'vista' dialog box to select folders.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sonic_3_A.I.R_Animation_Editor
+namespace Sonic_3_AIR_Animation_Editor
 {
     public static class Extensions
     {
