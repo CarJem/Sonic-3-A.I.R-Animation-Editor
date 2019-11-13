@@ -129,5 +129,17 @@ namespace Sonic_3_AIR_Animation_Editor.Properties {
                 this["UseDarkMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastRefrenceFolder {
+            get {
+                return ((string)(this["LastRefrenceFolder"]));
+            }
+            set {
+                this["LastRefrenceFolder"] = value;
+            }
+        }
     }
 }
