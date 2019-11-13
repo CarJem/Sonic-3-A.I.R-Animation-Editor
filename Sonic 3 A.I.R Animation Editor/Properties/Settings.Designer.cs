@@ -33,5 +33,101 @@ namespace Sonic_3_AIR_Animation_Editor.Properties {
                 this["RecentItems"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#00000000")]
+        public global::System.Windows.Media.Color DefaultImageBGRefrence {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultImageBGRefrence"]));
+            }
+            set {
+                this["DefaultImageBGRefrence"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FFFFFFFF")]
+        public global::System.Windows.Media.Color DefaultImageBG {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultImageBG"]));
+            }
+            set {
+                this["DefaultImageBG"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF000000")]
+        public global::System.Windows.Media.Color DefaultFrameBorder {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultFrameBorder"]));
+            }
+            set {
+                this["DefaultFrameBorder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FF000000")]
+        public global::System.Windows.Media.Color DefaultFrameBorderRefrence {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultFrameBorderRefrence"]));
+            }
+            set {
+                this["DefaultFrameBorderRefrence"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#00FFFFFF")]
+        public global::System.Windows.Media.Color DefaultFrameBackground {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultFrameBackground"]));
+            }
+            set {
+                this["DefaultFrameBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#00FFFFFF")]
+        public global::System.Windows.Media.Color DefaultFrameBackgroundRefrence {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultFrameBackgroundRefrence"]));
+            }
+            set {
+                this["DefaultFrameBackgroundRefrence"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("#FFFF0000")]
+        public global::System.Windows.Media.Color DefaultAlignmentLinesColor {
+            get {
+                return ((global::System.Windows.Media.Color)(this["DefaultAlignmentLinesColor"]));
+            }
+            set {
+                this["DefaultAlignmentLinesColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseDarkMode {
+            get {
+                return ((bool)(this["UseDarkMode"]));
+            }
+            set {
+                this["UseDarkMode"] = value;
+            }
+        }
     }
 }

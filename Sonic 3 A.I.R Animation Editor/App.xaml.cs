@@ -22,7 +22,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
         public App()
         {
-            if (true) ChangeSkin(Skin.Dark);
+            if (Sonic_3_AIR_Animation_Editor.Properties.Settings.Default.UseDarkMode) ChangeSkin(Skin.Dark);
             else ChangeSkin(Skin.Light);
         }
 
