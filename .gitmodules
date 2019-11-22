@@ -1,6 +1,0 @@
-[submodule "GenerationsLib"]
-	path = GenerationsLib
-	url = https://github.com/CarJem/GenerationsLib.git
-[submodule "AIR-API"]
-	path = AIR-API
-	url = https://github.com/CarJem/AIR-API.git
