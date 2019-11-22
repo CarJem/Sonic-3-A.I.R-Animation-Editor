@@ -9,6 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIR-API", "AIR-API\AIR-API\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerationsLib.WPF", "GenerationsLib\GenerationsLib.WPF\GenerationsLib.WPF.csproj", "{335800A2-F482-4AE6-9017-57D7C3C52110}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{A5E8C17E-F122-4DFA-98EA-E359443099BC}"
+	ProjectSection(SolutionItems) = preProject
+		Installer\MakeInstaller.bat = Installer\MakeInstaller.bat
+		Installer\Sonic 3 A.I.R. Animation Editor.nsi = Installer\Sonic 3 A.I.R. Animation Editor.nsi
+		Installer\Sonic 3 A.I.R. Animation Editor.nsi.bak = Installer\Sonic 3 A.I.R. Animation Editor.nsi.bak
+		Installer\win.bmp = Installer\win.bmp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
