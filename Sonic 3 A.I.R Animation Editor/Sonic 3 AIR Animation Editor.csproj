@@ -38,7 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Sonic3AIR.ico</ApplicationIcon>
+    <ApplicationIcon>AIR_Animation_Editor_Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Sonic_3_AIR_Animation_Editor.App</StartupObject>
@@ -153,9 +153,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Sonic3AIR.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\AIR-API\AIR-API\AIR-API.csproj">
       <Project>{4311f3b1-e4a1-401c-bc13-e5e80254242e}</Project>
       <Name>AIR-API</Name>
@@ -164,6 +161,9 @@
       <Project>{335800a2-f482-4ae6-9017-57d7c3c52110}</Project>
       <Name>GenerationsLib.WPF</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="AIR_Animation_Editor_Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets')" />
@@ -194,6 +194,7 @@ if $(ConfigurationName) == Publish (
 
 call "$(SolutionDir)Installer\MakeInstaller.bat"
 
-)</PostBuildEvent>
+)
+EXIT 0</PostBuildEvent>
   </PropertyGroup>
 </Project>

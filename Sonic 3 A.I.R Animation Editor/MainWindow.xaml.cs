@@ -83,6 +83,7 @@ namespace Sonic_3_AIR_Animation_Editor
         public MainWindow()
         {
             InitializeComponent();
+            this.Title = string.Format("{0} {1}", this.Title, App.Version);
             ImportPersonalColorPresets();
             SetupSavedConfigurations();
             UpdateUI();
@@ -180,7 +181,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
         #region File Tab Methods
 
-        private void OpenFile(object sender, RoutedEventArgs e)
+        private void OpenFileEvent(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog()
             {
@@ -222,7 +223,7 @@ namespace Sonic_3_AIR_Animation_Editor
             else FileSave();
         }
 
-        private void UnloadMenuItem_Click(object sender, RoutedEventArgs e)
+        private void UnloadEvent(object sender, RoutedEventArgs e)
         {
             CurrentFrame = null;
             CurrentAnimation = null;
@@ -1042,9 +1043,15 @@ namespace Sonic_3_AIR_Animation_Editor
 
                 var startRecentItems = OpenRecentsMenuItem.Items.IndexOf(NoRecentFiles);
 
+                int index = 1;
                 foreach (var dataDirectory in recentDataDirectories)
                 {
-                    RecentItems.Add(CreateDataDirectoryMenuLink(dataDirectory));
+                    int item_key;
+                    if (index == 9) item_key = index;
+                    else if (index >= 10) item_key = -1;
+                    else item_key = index;
+                    RecentItems.Add(CreateDataDirectoryMenuLink(dataDirectory, index));
+                    index++;
                 }
 
 
@@ -1063,10 +1070,11 @@ namespace Sonic_3_AIR_Animation_Editor
 
         }
 
-        private MenuItem CreateDataDirectoryMenuLink(string target)
+        private MenuItem CreateDataDirectoryMenuLink(string target, int index)
         {
             MenuItem newItem = new MenuItem();
             newItem.Header = target;
+            if (index != -1) newItem.InputGestureText = string.Format("Ctrl + {0}", index);
             newItem.Tag = target;
             newItem.Click += RecentItem_Click;
             return newItem;
@@ -1632,6 +1640,63 @@ namespace Sonic_3_AIR_Animation_Editor
                 }
             }
 
+        }
+
+        #endregion
+
+        #region Keyboard Input Events
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                //NewFile
+            }
+            else if (e.Key == Key.O && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                //OpenFile
+                if (OpenMenuItem.IsEnabled) OpenFileEvent(null, null);
+            }
+            else if(e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                //SaveFile
+                if (SaveMenuItem.IsEnabled) SaveFileEvent(null, null);
+            }
+            else if(e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                //SaveFileAs
+                if (SaveAsMenuItem.IsEnabled) SaveFileAsEvent(null, null);
+            }
+            else if(e.Key == Key.U && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                //UnloadFile
+                if (UnloadMenuItem.IsEnabled) UnloadEvent(null, null);
+            }
+            else if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                int recentItem = -1;
+
+                if (e.Key == Key.D1) recentItem = 0;
+                else if (e.Key == Key.D2) recentItem = 1;
+                else if (e.Key == Key.D3) recentItem = 2;
+                else if (e.Key == Key.D4) recentItem = 3;
+                else if (e.Key == Key.D5) recentItem = 4;
+                else if (e.Key == Key.D6) recentItem = 5;
+                else if (e.Key == Key.D7) recentItem = 6;
+                else if (e.Key == Key.D8) recentItem = 7;
+                else if (e.Key == Key.D9) recentItem = 8;
+                else if (e.Key == Key.D0) recentItem = 9;
+
+                if (recentItem != -1)
+                {
+                    RefreshRecentFiles(Properties.Settings.Default.RecentItems);
+                    if (RecentItems.Count >= recentItem && RecentItems.Count != 0) RecentItem_Click(RecentItems.ElementAt(recentItem), null);
+                }
+
+
+
+
+            }
         }
 
         #endregion

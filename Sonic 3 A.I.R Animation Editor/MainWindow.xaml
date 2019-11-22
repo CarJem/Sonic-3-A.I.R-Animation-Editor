@@ -8,7 +8,7 @@
         xmlns:wpfTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
         xmlns:local="clr-namespace:Sonic_3_AIR_Animation_Editor"
         mc:Ignorable="d"
-        Title="Sonic 3 A.I.R Animation Editor ALPHA 2" Height="550" Width="766" MinWidth="800" MinHeight="550" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
+        Title="Sonic 3 A.I.R Animation Editor" Height="550" KeyDown="Window_KeyDown" Width="766" MinWidth="800" MinHeight="550" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"></RowDefinition>
@@ -17,9 +17,9 @@
         </Grid.RowDefinitions>
         <Menu Background="{DynamicResource MenuBar}">
             <MenuItem Header="File">
-                <MenuItem Name="NewMenuItem" Header="New" InputGestureText="Ctrl + N" Click="OpenFile"></MenuItem>
+                <MenuItem Name="NewMenuItem" Header="New" InputGestureText="Ctrl + N" Click="OpenFileEvent"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Name="OpenMenuItem" Header="Open..." InputGestureText="Ctrl + O" Click="OpenFile"></MenuItem>
+                <MenuItem Name="OpenMenuItem" Header="Open..." InputGestureText="Ctrl + O" Click="OpenFileEvent"></MenuItem>
                 <MenuItem Name="OpenRecentsMenuItem" Header="Open Recent..." SubmenuOpened="OpenRecentsMenuItem_SubmenuOpened">
                     <MenuItem Name="NoRecentFiles" Header="No Recent Files" IsEnabled="False"></MenuItem>
                 </MenuItem>
@@ -27,7 +27,7 @@
                 <MenuItem Name="SaveMenuItem" Header="Save" InputGestureText="Ctrl + S" Click="SaveFileEvent"></MenuItem>
                 <MenuItem Name="SaveAsMenuItem" Header="Save As..." InputGestureText="Ctrl + Alt + S" Click="SaveFileAsEvent"></MenuItem>
                 <Separator></Separator>
-                <MenuItem Name="UnloadMenuItem" Header="Unload" Click="UnloadMenuItem_Click"></MenuItem>
+                <MenuItem Name="UnloadMenuItem" Header="Unload" Click="UnloadEvent" InputGestureText="Ctrl + U"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Name="ExitMenuItem" Header="Exit" Click="ExitEditor"></MenuItem>
 
