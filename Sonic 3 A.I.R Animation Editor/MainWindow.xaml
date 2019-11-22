@@ -1,0 +1,411 @@
+﻿<Window x:Class="Sonic_3_AIR_Animation_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:n="clr-namespace:ControlLib;assembly=NumericUpDown"
+        xmlns:render="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
+        xmlns:wpfTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+        xmlns:local="clr-namespace:Sonic_3_AIR_Animation_Editor"
+        mc:Ignorable="d"
+        Title="Sonic 3 A.I.R Animation Editor ALPHA 2" Height="550" Width="766" MinWidth="800" MinHeight="550" SizeChanged="Window_SizeChanged" ResizeMode="CanResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"></RowDefinition>
+            <RowDefinition Height="400"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Menu Background="{DynamicResource MenuBar}">
+            <MenuItem Header="File">
+                <MenuItem Name="NewMenuItem" Header="New" InputGestureText="Ctrl + N" Click="OpenFile"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="OpenMenuItem" Header="Open..." InputGestureText="Ctrl + O" Click="OpenFile"></MenuItem>
+                <MenuItem Name="OpenRecentsMenuItem" Header="Open Recent..." SubmenuOpened="OpenRecentsMenuItem_SubmenuOpened">
+                    <MenuItem Name="NoRecentFiles" Header="No Recent Files" IsEnabled="False"></MenuItem>
+                </MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="SaveMenuItem" Header="Save" InputGestureText="Ctrl + S" Click="SaveFileEvent"></MenuItem>
+                <MenuItem Name="SaveAsMenuItem" Header="Save As..." InputGestureText="Ctrl + Alt + S" Click="SaveFileAsEvent"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="UnloadMenuItem" Header="Unload" Click="UnloadMenuItem_Click"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Name="ExitMenuItem" Header="Exit" Click="ExitEditor"></MenuItem>
+
+
+            </MenuItem>
+            
+            <MenuItem Header="View">
+
+                <MenuItem IsCheckable="True" Header="Show Frame Border" Name="ShowFrameBorderItem" Checked="ShowFrameBorderItem_Checked" Unchecked="ShowFrameBorderItem_Checked"/>
+                <MenuItem IsEnabled="True" IsCheckable="True" Header="Show Full Image" Name="ShowFullImageItem" Checked="ShowFullImageItem_Checked" Unchecked="ShowFullImageItem_Checked"/>
+                <MenuItem IsCheckable="True" IsEnabled="False" Header="   Only Show Section of Refrence Frame" Name="ClipRefrenceFrameItem" Checked="ClipRefrenceFrameItem_Checked" Unchecked="ClipRefrenceFrameItem_Checked"/>
+                <MenuItem IsCheckable="True" Header="Show Alignment Lines" Name="ShowCenterAlignmentLines" Checked="ShowCenterAlignmentLines_Checked" Unchecked="ShowCenterAlignmentLines_Checked"/>
+                <MenuItem IsCheckable="True" Header="Show Solid Image Background" Name="ShowSolidImageTransparencyBackground" Checked="ShowSolidImageTransparencyBackground_Checked" Unchecked="ShowSolidImageTransparencyBackground_Checked"/>
+                <MenuItem IsCheckable="True" Header="Force Viewer to Center Frame" Name="ForceCenterFrameItem" Checked="ForceCenterFrameItem_Checked" Unchecked="ForceCenterFrameItem_Checked"/>
+            </MenuItem>
+            <MenuItem Header="Frames">
+                <MenuItem Name="StandardRefrence" Header="Standard..." IsEnabled="False">
+                    <MenuItem Header="Sonic...">
+                        <MenuItem Header="Sonic (Main)" Name="RefrenceSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Sonic (Snowboard)" Name="RefrenceSonicSnowboardButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Sonic (Peel Out)"  Name="RefrenceSonicPeelOutButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Sonic (Drop Dash)"  Name="RefrenceSonicDropDashButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Tails" Name="RefrenceTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="Knuckles" Name="RefrenceKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="Super Sonic" Name="RefrenceSuperSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                </MenuItem>
+
+                <MenuItem Name="BSRefrence" Header="Blue Spheres..." IsEnabled="False">
+                    <MenuItem Header="Sonic" Name="RefrenceBSSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="Tails" Name="RefrenceBSTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="Knuckles" Name="RefrenceBSKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                </MenuItem>
+                <MenuItem Header="HUD" IsEnabled="False" Name="RefrenceHUDButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                <MenuItem Visibility="Visible" Header="Custom..." Name="CustomRefrenceButton" Click="CustomRefrenceButton_Click"></MenuItem>
+                <MenuItem IsChecked="True" Header="None (Default)" Name="RefrenceNothingButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                <Separator></Separator>
+                <MenuItem Header="Set Refrence Folder Path..." Name="SetRefrenecFolderPath" Click="SetRefreneceFolderPath_Click"></MenuItem>
+                <Separator></Separator>
+                <MenuItem IsEnabled="False" Header="Default Location in A.I.R. Install: &#10;(sonic3air__game\doc\modding\sprites)" Name="RefrenceNoteItem"/>
+                <StackPanel Width="180" IsEnabled="True" Margin="0,5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <TextBlock Foreground="{DynamicResource DisabledText}" Text="Current Refrence Folder: " TextWrapping="Wrap" ></TextBlock>
+                    <TextBox Height="25" VerticalContentAlignment="Center" Foreground="{DynamicResource DisabledText}" IsReadOnly="True" Text="N/A" Name="RefrenceFolderPathLabel">
+                        <TextBox.ToolTip>
+                            <ToolTip Background="{DynamicResource NormalBackground}">
+                                <StackPanel>
+                                    <TextBlock Foreground="{DynamicResource NormalText}" Text="N/A" Name="RefrenceFolderPathLabelTooltip"></TextBlock>
+                                </StackPanel>
+                            </ToolTip>
+                        </TextBox.ToolTip>
+                    </TextBox>
+                </StackPanel>
+
+
+            </MenuItem>
+            <MenuItem Header="Options">
+                <MenuItem Header="Use Dark Mode" Name="DarkModeButton" Click="DarkModeButton_Click"></MenuItem>
+                <MenuItem Header="About..." IsEnabled="False"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1" Grid.RowSpan="2" Background="{DynamicResource NormalBackground2}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                </Grid.RowDefinitions>
+                <ListBox Name="FrameViewer" Style="{DynamicResource BaseListBoxStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="FrameViewer_SelectionChanged">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"></VirtualizingStackPanel>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Image Width="45" Height="45" Source="{Binding FrameImage}" HorizontalAlignment="Center"></Image>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel Grid.Row="1" Background="{DynamicResource NormalBackground}">
+                    <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Width="42" Height="30" HorizontalAlignment="Left">
+                        <ScrollBar Grid.Column="1" Orientation="Horizontal" Width="40" Height="28" x:Name="AnimationScroller" ValueChanged="AnimationScroller_ValueChanged" SmallChange="1" Value="2" Maximum="3" Minimum="0"/>
+                    </Border>
+                </StackPanel>
+
+
+
+            </Grid>
+            <Grid Grid.Column="0" Grid.RowSpan="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                    <RowDefinition Height="30"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="30"></RowDefinition>
+                    </Grid.RowDefinitions>
+                </Grid>
+                <ListBox Name="EntriesList" HorizontalContentAlignment="Left"  Style="{DynamicResource BaseListBoxStyle}" ItemContainerStyle="{DynamicResource BaseListBoxItemStyle}" SelectionChanged="EntriesList_SelectionChanged" SelectionMode="Single" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
+                <Button Grid.Row="1" IsEnabled="False"></Button>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
+                    <Button Name="MoveUpButton" Width="30" Height="30" Margin="0 0 0 0" Content="↑" Click="MoveUpButton_Click"></Button>
+                    <Button Name="MoveDownButton" Width="30" Height="30" Margin="0 0 0 0" Content="↓" Click="MoveDownButton_Click"></Button>
+                    <Button Name="AddButton" Width="30" Height="30" Margin="0 0 0 0" Content="+" Click="AddButton_Click"></Button>
+                    <Button Name="RemoveButton" Width="30" Height="30" Margin="0 0 0 0" Content="-" Click="RemoveButton_Click"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                </StackPanel>
+            </Grid>
+            <Grid  Grid.Column="3" Grid.RowSpan="3" Margin="5">
+                <StackPanel>
+                    <GroupBox Margin="5,0" Header="Refrence Image Opacity:" Foreground="{DynamicResource NormalText}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalAlignment="Right" Content="Width:"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="1" IsManipulationEnabled="True" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="WidthNUD" ValueChanged="NUD_ValueChanged" Mouse.MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Height:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="HeightNUD" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalAlignment="Right" Content="X:"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="XNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Y:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Name="YNUD" Margin="5" Grid.Row="1" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="A"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Label HorizontalAlignment="Right" Content="Center X:"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="CenterXNUD" Margin="5" Grid.Row="0" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Maximum="256" Minimum="-256" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Center Y:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Name="CenterYNUD" Margin="5" Grid.Row="0" ValueChanged="NUD_ValueChanged" MouseWheel="NUD_MouseWheel" Maximum="256" Minimum="-256" Keyboard.KeyDown="NUD_KeyDown" Keyboard.KeyUp="NUD_KeyDown"></wpfTool:IntegerUpDown>
+                                <Label Margin="5,0" HorizontalAlignment="Right" Grid.Row="1" Content="Name:" Grid.Column="0"></Label>
+                                <Label Margin="5,0" HorizontalAlignment="Right" Content="File:" Grid.Row="2" Grid.Column="0"></Label>
+
+                                <Grid Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="1">
+                                    <TextBox Margin="5,0" Name="NameTextBox" Grid.Row="0" Height="20" TextChanged="FrameTextBox_TextChanged" Grid.Column="0"></TextBox>
+                                </Grid>
+                                <Grid Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="25"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Margin="5,0,0,0" Name="FileTextBox" Grid.Row="1" Height="20" TextChanged="FrameTextBox_TextChanged" Grid.Column="0"></TextBox>
+                                    <Button x:Name="FileSpriteSelectButton" Click="FileSpriteSelectButton_Click" Margin="0,3,5,3" Content="..." Grid.Column="1">
+                                        <Button.ContextMenu>
+                                            <ContextMenu Style="{DynamicResource DefaultContextMenuStyle}" Name="SpriteSheetFileList"></ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox x:Name="RefrenceOpacityLabel" Margin="5,0" Header="Refrence Image Opacity:" Foreground="{DynamicResource NormalText}">
+                        <Slider Margin="5,0" IsEnabled="False" Grid.Row="1" Maximum="99" Minimum="0" Value="100" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
+                    </GroupBox>
+                    <GroupBox Margin="5,0" Header="Viewer Colors" Foreground="{DynamicResource NormalText}">
+                        <Grid Margin="5,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition Width="30"></ColumnDefinition>
+                                <ColumnDefinition Width="30"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <Separator Grid.Column="0" Padding="0" Margin="0,0,5,0"></Separator>
+                            <Label Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Main" Padding="0"></Label>
+                            <Label Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Ref." Padding="0"></Label>
+
+                            <Label Grid.Column="0" Grid.Row="1" Content="Frame Background:"></Label>
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBGColorPick" Grid.Column="1" Grid.Row="1" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <Label Grid.Column="0" Grid.Row="2" Content="Frame Border:"></Label>
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBorderColorPick" Grid.Row="2" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <Label Grid.Column="0" Grid.Row="3" Content="Image Background:"></Label>
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgBGColorPick" Grid.Row="3" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1" SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="3" Grid.Row="1" x:Name="RefImgFrameBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Row="2" x:Name="RefImgFrameBorderColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="2"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="RefImgBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Row="3" Grid.Column="2"  SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                            <Label Grid.Column="0" Grid.Row="4" Content="Axis Lines:"></Label>
+                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="1" Grid.Row="4" x:Name="AlignmentLinesColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Red" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+
+                        </Grid>
+                    </GroupBox>
+
+
+
+                </StackPanel>
+            </Grid>
+            <Border BorderThickness="1" BorderBrush="{DynamicResource ButtonBorder}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1">
+                <Grid MouseWheel="CanvasView_MouseWheel">
+                    <Grid Background="#303030" MouseWheel="CanvasView_MouseWheel">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition Height="30"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <render:SKElement Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" PaintSurface="CanvasView_PaintSurface" MouseWheel="CanvasView_MouseWheel" Focusable="True" x:Name="CanvasView" Margin="0 0 0 0" RenderOptions.BitmapScalingMode="NearestNeighbor" ClipToBounds="True"></render:SKElement>
+                        <Grid Background="{DynamicResource MenuBar}" Grid.ColumnSpan="2" Grid.Row="1">
+                            <StackPanel Margin="5" Height="20" Orientation="Horizontal">
+                                <Button  x:Name="ButtonZoomIn" Click="ButtonZoomIn_Click">
+                                    <Button.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Zoom in"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </Button.ToolTip>
+                                    <Image Width="16" Source="{DynamicResource ZoomIn_16x}"/>
+                                </Button>
+                                <Button x:Name="ButtonZoomOut" Click="ButtonZoomOut_Click">
+                                    <Button.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel>
+                                                <Label Content="Zoom out"/>
+                                            </StackPanel>
+                                        </ToolTip>
+
+                                    </Button.ToolTip>
+                                    <Image Width="16" Source="{DynamicResource ZoomOut_16x}"/>
+                                </Button>
+                                <Separator  Margin="3 0 3 0" Style="{DynamicResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Visible" />
+
+                                <ToggleButton x:Name="ButtonShowCenter" Click="ButtonShowCenter_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Show a guide to center a frame"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource AlignContent_16x}"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="ButtonShowBackground" Click="ButtonShowBackground_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Show a background for the transparent parts of the image"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <TextBlock Width="16" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,1,0,0" Text="BG"/>
+                                </ToggleButton>
+                                <ToggleButton x:Name="ButtonShowFrameBorder" Click="ButtonShowFrameBorder_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Show a frame around the selection"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource AppearanceTabSolid_16x}"/>
+                                </ToggleButton>
+                                <Separator  Margin="3 0 3 0" Style="{DynamicResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Visible" />
+
+                                <ToggleButton x:Name="ButtonShowFullImage" Click="ButtonShowFullImage_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Show the full image containing the selected frame"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource AppearanceTabSwatch_16x}"/>
+                                </ToggleButton>
+                                <ToggleButton IsEnabled="False" x:Name="ButtonShowOnlyRefrenceSection" Click="ButtonShowOnlyRefrenceSection_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Show only the refrence frame section when viewing the full image of a frame"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource AppearanceTabSolid2_16x}"/>
+                                </ToggleButton>
+                                <Separator  Margin="3 0 3 0" Style="{DynamicResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Visible" />
+
+                                <ToggleButton x:Name="ButtonForceCenterFrame" Click="ButtonForceCenterImage_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Center the frame regardless of pivot values (does not change any values)"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource CenterImage_16x}"/>
+                                </ToggleButton>
+
+                                <Separator  Margin="3 0 3 0" Style="{DynamicResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Visible" />
+
+                                <Button Width="20" Height="20" Content="?" x:Name="ButtonHelp" Click="ButtonHelp_Click" Visibility="Collapsed">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <StackPanel Background="Transparent">
+                                                <TextBlock><Run Text="Controls (Frame Viewer):"/></TextBlock>
+                                                <TextBlock><Run Text="Arrows (Ctrl) - Frame Width/Height"/></TextBlock>
+                                                <TextBlock Visibility="Collapsed"><Run Text="Arrows (Alt) - Pivot X/Y"/></TextBlock>
+                                                <TextBlock><Run Text="Arrows (Shift) - Frame Top/Left"/></TextBlock>
+                                                <Separator/>
+                                                <TextBlock><Run Text="Mouse (Ctrl) - Frame Width/Height"/></TextBlock>
+                                                <TextBlock><Run Text="Mouse (Alt) - Pivot X/Y"/></TextBlock>
+                                                <TextBlock><Run Text="Mouse (Shift) - Frame Top/Left"/></TextBlock>
+                                            </StackPanel>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                    <Button.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <Label Content="Help"/>
+                                        </ToolTip>
+                                    </Button.ToolTip>
+                                </Button>
+                                <Button Width="20" Height="20" Grid.Column="1" Visibility="Hidden"/>
+                                <Button Width="20" Height="20" Grid.Column="1" Visibility="Hidden"/>
+                            </StackPanel>
+                        </Grid>
+
+                    </Grid>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+</Window>
