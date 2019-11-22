@@ -43,6 +43,17 @@
   <PropertyGroup>
     <StartupObject>Sonic_3_AIR_Animation_Editor.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Publish|AnyCPU'">
+    <OutputPath>bin\Publish\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -149,6 +160,10 @@
       <Project>{4311f3b1-e4a1-401c-bc13-e5e80254242e}</Project>
       <Name>AIR-API</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GenerationsLib\GenerationsLib.WPF\GenerationsLib.WPF.csproj">
+      <Project>{335800a2-f482-4ae6-9017-57d7c3c52110}</Project>
+      <Name>GenerationsLib.WPF</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets')" />
@@ -158,4 +173,27 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>@ECHO OFF
+
+SET HOUR=%25time:~0,2%25
+
+SET dtStamp9=%25date:~-4%25.%25date:~4,2%25.%25date:~7,2%25_0%25time:~1,1%25-%25time:~3,2%25-%25time:~6,2%25 
+
+SET dtStamp24=%25date:~-4%25.%25date:~4,2%25.%25date:~7,2%25_%25time:~0,2%25-%25time:~3,2%25-%25time:~6,2%25
+
+
+if "%25HOUR:~0,1%25" == " " (SET dtStamp=%25dtStamp9%25)
+else (SET dtStamp=%25dtStamp24%25)
+
+ECHO %25dtStamp%25 
+
+
+
+if $(ConfigurationName) == Publish (
+
+call "$(SolutionDir)Installer\MakeInstaller.bat"
+
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>
