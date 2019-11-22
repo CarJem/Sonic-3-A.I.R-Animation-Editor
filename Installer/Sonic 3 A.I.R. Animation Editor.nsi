@@ -89,34 +89,7 @@ Section -MainProgram
 ${INSTALL_TYPE}
 SetOverwrite ifnewer
 SetOutPath "$INSTDIR"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\AIR-API.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\AIR-API.pdb"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\GenerationsLib.WPF.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\GenerationsLib.WPF.pdb"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\libSkiaSharp.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\libSkiaSharp.dylib"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Newtonsoft.Json.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Newtonsoft.Json.xml"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\NumericUpDown.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.Desktop.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.Desktop.xml"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.Gtk.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.Gtk.xml"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.WPF.dll"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.Views.WPF.xml"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\SkiaSharp.xml"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor Test 2.zip"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor Test..zip"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor.exe"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor.exe.config"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor.exe.zip"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Sonic 3 A.I.R Animation Editor.pdb"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\Xceed.Wpf.Toolkit.dll"
-SetOutPath "$INSTDIRx86"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\x86\libSkiaSharp.dll"
-SetOutPath "$INSTDIRx64"
-File "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\x64\libSkiaSharp.dll"
+File /r "D:\Users\CarJem\source\sonic3air_repos\Sonic 3 A.I.R Animation Editor\Sonic 3 A.I.R Animation Editor\bin\Release\*.*"
 SectionEnd
 
 ######################################################################
@@ -167,42 +140,7 @@ SectionEnd
 
 Section Uninstall
 ${INSTALL_TYPE}
-Delete "$INSTDIR\AIR-API.dll"
-Delete "$INSTDIR\AIR-API.pdb"
-Delete "$INSTDIR\GenerationsLib.WPF.dll"
-Delete "$INSTDIR\GenerationsLib.WPF.pdb"
-Delete "$INSTDIR\libSkiaSharp.dll"
-Delete "$INSTDIR\libSkiaSharp.dylib"
-Delete "$INSTDIR\Newtonsoft.Json.dll"
-Delete "$INSTDIR\Newtonsoft.Json.xml"
-Delete "$INSTDIR\NumericUpDown.dll"
-Delete "$INSTDIR\SkiaSharp.dll"
-Delete "$INSTDIR\SkiaSharp.Views.Desktop.dll"
-Delete "$INSTDIR\SkiaSharp.Views.Desktop.xml"
-Delete "$INSTDIR\SkiaSharp.Views.Gtk.dll"
-Delete "$INSTDIR\SkiaSharp.Views.Gtk.xml"
-Delete "$INSTDIR\SkiaSharp.Views.WPF.dll"
-Delete "$INSTDIR\SkiaSharp.Views.WPF.xml"
-Delete "$INSTDIR\SkiaSharp.xml"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor Test 2.zip"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor Test..zip"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor.exe"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor.exe.config"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor.exe.zip"
-Delete "$INSTDIR\Sonic 3 A.I.R Animation Editor.pdb"
-Delete "$INSTDIR\Xceed.Wpf.Toolkit.dll"
-Delete "$INSTDIRx86\libSkiaSharp.dll"
-Delete "$INSTDIRx64\libSkiaSharp.dll"
- 
-RmDir "$INSTDIRx64"
-RmDir "$INSTDIRx86"
- 
-Delete "$INSTDIR\uninstall.exe"
-!ifdef WEB_SITE
-Delete "$INSTDIR\${APP_NAME} website.url"
-!endif
-
-RmDir "$INSTDIR"
+RmDir /r "$INSTDIR"
 
 !ifdef REG_START_MENU
 !insertmacro MUI_STARTMENU_GETFOLDER "Application" $SM_Folder
