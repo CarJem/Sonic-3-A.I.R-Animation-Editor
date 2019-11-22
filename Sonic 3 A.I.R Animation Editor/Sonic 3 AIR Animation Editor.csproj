@@ -145,10 +145,6 @@
     <Resource Include="Sonic3AIR.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\GenerationsLib\GenerationsLib.WPF\GenerationsLib.WPF.csproj">
-      <Project>{335800a2-f482-4ae6-9017-57d7c3c52110}</Project>
-      <Name>GenerationsLib.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\AIR-API\AIR-API\AIR-API.csproj">
       <Project>{4311f3b1-e4a1-401c-bc13-e5e80254242e}</Project>
       <Name>AIR-API</Name>
