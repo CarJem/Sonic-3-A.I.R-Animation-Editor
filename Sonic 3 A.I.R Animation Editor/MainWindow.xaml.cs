@@ -783,6 +783,12 @@ namespace Sonic_3_AIR_Animation_Editor
         #endregion
 
         #region Events
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow about = new AboutWindow();
+            about.Owner = this;
+            about.ShowDialog();
+        }
 
         private bool AllowListViewUpdate = true;
         private void OpacitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

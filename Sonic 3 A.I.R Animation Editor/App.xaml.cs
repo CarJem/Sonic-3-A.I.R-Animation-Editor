@@ -14,7 +14,7 @@ namespace Sonic_3_AIR_Animation_Editor
     public enum Skin { Dark, Light }
     public partial class App : Application
     {
-        public static string Version = "v1.0 Release Canidate 1";
+        public static string Version = "v1.0";
 
         public static App Instance;
 
