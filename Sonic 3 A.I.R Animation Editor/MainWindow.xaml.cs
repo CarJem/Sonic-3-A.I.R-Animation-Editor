@@ -699,7 +699,6 @@ namespace Sonic_3_AIR_Animation_Editor
                             string fileName = $"{CurrentAnimation.Directory}\\{CurrentFrame.File}";
                             FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                             System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
-                            fileStream.Close();
                             if (img.Palette.Entries.Length > 0)
                             {
                                 var color = img.Palette.Entries[0];
@@ -714,6 +713,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
                             img.Dispose();
                             img = null;
+                            fileStream.Close();
 
                         }
                         else
@@ -749,7 +749,6 @@ namespace Sonic_3_AIR_Animation_Editor
                             string fileName = $"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}";
                             FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                             System.Drawing.Bitmap img = new System.Drawing.Bitmap(fileStream);
-                            fileStream.Close();
                             if (img.Palette.Entries.Length > 0)
                             {
                                 var color = img.Palette.Entries[0];
@@ -766,6 +765,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
                             img.Dispose();
                             img = null;
+                            fileStream.Close();
 
                         }
                         else
