@@ -83,7 +83,10 @@ namespace Sonic_3_AIR_Animation_Editor
         public MainWindow()
         {
             InitializeComponent();
-            this.Title = string.Format("{0} {1}", this.Title, App.Version);
+            this.Title = string.Format("{0} {1}", this.Title, Program.Version);
+
+
+
             ImportPersonalColorPresets();
             SetupSavedConfigurations();
             UpdateUI();
@@ -241,7 +244,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
         private void ExitEditor(object sender, RoutedEventArgs e)
         {
-            Environment.Exit(0);
+            this.Close();
         }
 
         private void DarkModeButton_Click(object sender, RoutedEventArgs e)
@@ -426,6 +429,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
         public void UpdateValues()
         {
+            Program.Log.InfoFormat("Setting Editor Control Values from Animation Entry...");
             AllowUpdate = false;
             NameTextBox.Text = CurrentFrame.Name;
             FileTextBox.Text = CurrentFrame.File;
@@ -442,11 +446,19 @@ namespace Sonic_3_AIR_Animation_Editor
 
             CenterXNUD.Value = CurrentFrame.CenterX;
             CenterYNUD.Value = CurrentFrame.CenterY;
+
+            CenterXNUD.Minimum = int.MinValue;
+            CenterXNUD.Maximum = int.MaxValue;
+
+            CenterYNUD.Minimum = int.MinValue;
+            CenterYNUD.Maximum = int.MaxValue;
+
             AllowUpdate = true;
         }
 
         public void VoidValues()
         {
+            Program.Log.InfoFormat("Voiding Editor Control Values...");
             AllowUpdate = false;
             NameTextBox.Text = "";
             FileTextBox.Text = "";
@@ -674,8 +686,10 @@ namespace Sonic_3_AIR_Animation_Editor
 
             void MainImage()
             {
+
                 if (CurrentSpriteSheetName != CurrentFrame.File || CurrentSpriteSheet == null)
                 {
+                    Program.Log.InfoFormat("Collecting Main Image...");
                     Dispose();
                     CurrentSpriteSheetName = "";
                     try
@@ -706,10 +720,11 @@ namespace Sonic_3_AIR_Animation_Editor
                         {
                             Dispose();
                         }
-
+                        Program.Log.InfoFormat("Main Image Collected!");
                     }
                     catch
                     {
+                        Program.Log.InfoFormat("Main Image Collection Failed!");
                         Dispose();
                     }
                 }
@@ -728,6 +743,7 @@ namespace Sonic_3_AIR_Animation_Editor
                     CurrentRefrenceSpriteSheetName = "";
                     try
                     {
+                        Program.Log.InfoFormat("Collecting Refrence Image...");
                         if (File.Exists($"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}"))
                         {
                             string fileName = $"{CurrentRefrenceAnimation.Directory}\\{CurrentRefrenceFrame.File}";
@@ -756,10 +772,11 @@ namespace Sonic_3_AIR_Animation_Editor
                         {
                             Dispose();
                         }
-
+                        Program.Log.InfoFormat("Refrence Image Collected!");
                     }
                     catch
                     {
+                        Program.Log.InfoFormat("Refrence Image Collection Failed!");
                         Dispose();
                     }
                 }

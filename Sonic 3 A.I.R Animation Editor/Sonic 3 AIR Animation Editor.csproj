@@ -41,7 +41,7 @@
     <ApplicationIcon>AIR_Animation_Editor_Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Sonic_3_AIR_Animation_Editor.App</StartupObject>
+    <StartupObject>Sonic_3_AIR_Animation_Editor.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Publish|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -58,6 +58,9 @@
     <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -102,6 +105,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AboutWindow.xaml.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Reflector.cs" />
     <Compile Include="SkinResourceDictonary.cs" />
     <Page Include="AboutWindow.xaml">
@@ -151,11 +155,17 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
+    <None Include="Properties\PostBuild.bat" />
+    <None Include="Properties\PreBuild.bat" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Properties\Versioning\build_list.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -176,6 +186,7 @@
   <ItemGroup>
     <Resource Include="Resources\win.bmp" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets" Condition="Exists('..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -185,27 +196,9 @@
     <Error Condition="!Exists('..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SkiaSharp.1.68.0\build\net45\SkiaSharp.targets'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>@ECHO OFF
-
-SET HOUR=%25time:~0,2%25
-
-SET dtStamp9=%25date:~-4%25.%25date:~4,2%25.%25date:~7,2%25_0%25time:~1,1%25-%25time:~3,2%25-%25time:~6,2%25 
-
-SET dtStamp24=%25date:~-4%25.%25date:~4,2%25.%25date:~7,2%25_%25time:~0,2%25-%25time:~3,2%25-%25time:~6,2%25
-
-
-if "%25HOUR:~0,1%25" == " " (SET dtStamp=%25dtStamp9%25)
-else (SET dtStamp=%25dtStamp24%25)
-
-ECHO %25dtStamp%25 
-
-
-
-if $(ConfigurationName) == Publish (
-
-call "$(SolutionDir)Installer\MakeInstaller.bat"
-
-)
-EXIT 0</PostBuildEvent>
+    <PostBuildEvent>call "$(SolutionDir)\Sonic 3 A.I.R Animation Editor\Properties\PostBuild.bat" "$(ConfigurationName)" "$(SolutionDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>call "$(SolutionDir)Sonic 3 A.I.R Animation Editor\Properties\PreBuild.bat" "$(ConfigurationName)" "$(SolutionDir)Sonic 3 A.I.R Animation Editor\" "false" "true"</PreBuildEvent>
   </PropertyGroup>
 </Project>

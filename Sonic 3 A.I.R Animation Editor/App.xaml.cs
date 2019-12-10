@@ -14,7 +14,6 @@ namespace Sonic_3_AIR_Animation_Editor
     public enum Skin { Dark, Light }
     public partial class App : Application
     {
-        public static string Version = "v1.0";
 
         public static App Instance;
 
@@ -26,6 +25,19 @@ namespace Sonic_3_AIR_Animation_Editor
         {
             if (Sonic_3_AIR_Animation_Editor.Properties.Settings.Default.UseDarkMode) ChangeSkin(Skin.Dark);
             else ChangeSkin(Skin.Light);
+
+            #if DEBUG
+            System.Diagnostics.PresentationTraceSources.DataBindingSource.Switch.Level = System.Diagnostics.SourceLevels.Critical;
+            #endif
+
+            Instance = this;
+            this.InitializeComponent();
+        }
+
+        public void DefaultStart()
+        {
+            Program.Log.InfoFormat("Starting Animation Editor...");
+            this.Run(new MainWindow());
         }
 
 

@@ -17,7 +17,7 @@ namespace Sonic_3_AIR_Animation_Editor
 			InitializeComponent();
 			Title = String.Format("About {0}", AssemblyTitle);
 			labelProductName.Text = AssemblyProduct;
-			labelVersion.Text = String.Format("Version {0}", App.Version);
+			labelVersion.Text = String.Format("Version {0}", Program.Version);
 			buildDateLabel.Text = String.Format("Build Date: {0}", GetBuildTime) + Environment.NewLine + String.Format("Architecture: {0}", GetProgramType);
 			labelCopyright.Text = AssemblyCopyright;
 

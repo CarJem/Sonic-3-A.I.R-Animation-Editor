@@ -5,8 +5,7 @@
              xmlns:ControlLib="clr-namespace:ControlLib;assembly=NumericUpDown" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" 
              xmlns:Themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit" 
-             x:Class="Sonic_3_AIR_Animation_Editor.App"
-             StartupUri="MainWindow.xaml">
+             x:Class="Sonic_3_AIR_Animation_Editor.App" ShutdownMode="OnLastWindowClose">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
