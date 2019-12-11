@@ -33,7 +33,7 @@
 
 
             </MenuItem>
-            
+
             <MenuItem Header="View">
 
                 <MenuItem IsCheckable="True" Header="Show Frame Border" Name="ShowFrameBorderItem" Checked="ShowFrameBorderItem_Checked" Unchecked="ShowFrameBorderItem_Checked"/>
@@ -42,6 +42,10 @@
                 <MenuItem IsCheckable="True" Header="Show Alignment Lines" Name="ShowCenterAlignmentLines" Checked="ShowCenterAlignmentLines_Checked" Unchecked="ShowCenterAlignmentLines_Checked"/>
                 <MenuItem IsCheckable="True" Header="Show Solid Image Background" Name="ShowSolidImageTransparencyBackground" Checked="ShowSolidImageTransparencyBackground_Checked" Unchecked="ShowSolidImageTransparencyBackground_Checked"/>
                 <MenuItem IsCheckable="True" Header="Force Viewer to Center Frame" Name="ForceCenterFrameItem" Checked="ForceCenterFrameItem_Checked" Unchecked="ForceCenterFrameItem_Checked"/>
+                <MenuItem IsCheckable="True" IsEnabled="False" IsChecked="True" Header="Auto Pick Refrence Frames" Name="AutoPickRefrenceFramesMenuItem" Checked="AutoPickRefrenceFramesMenuItem_Checked" Unchecked="AutoPickRefrenceFramesMenuItem_Checked"/>
+                <MenuItem IsCheckable="True" IsEnabled="False" IsChecked="False" Header="Draw Refrence Frames First" Name="RefrenceFrameBehindMenuItem" Checked="RefrenceFrameBehindMenuItem_Checked" Unchecked="RefrenceFrameBehindMenuItem_Checked"/>
+
+
             </MenuItem>
             <MenuItem Header="Frames">
                 <MenuItem Name="StandardRefrence" Header="Standard..." IsEnabled="False">
@@ -50,25 +54,31 @@
                         <MenuItem Header="Sonic (Snowboard)" Name="RefrenceSonicSnowboardButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                         <MenuItem Header="Sonic (Peel Out)"  Name="RefrenceSonicPeelOutButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                         <MenuItem Header="Sonic (Drop Dash)"  Name="RefrenceSonicDropDashButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Blue Spheres" Name="RefrenceBSSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Tails" Name="RefrenceTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
-                    <MenuItem Header="Knuckles" Name="RefrenceKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="Tails...">
+                        <MenuItem Header="Tails (Main)" Name="RefrenceTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Tails (Blue Spheres)" Name="RefrenceBSTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Twin Tails (Main)" Name="RefrenceTailsTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Twin Tails (Blue Spheres)" Name="RefrenceBSTailsTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Knuckles...">
+                        <MenuItem Header="Knuckles (Main)" Name="RefrenceKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                        <MenuItem Header="Knuckles (Blue Spheres)" Name="RefrenceBSKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    </MenuItem>
                     <MenuItem Header="Super Sonic" Name="RefrenceSuperSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                 </MenuItem>
-
-                <MenuItem Name="BSRefrence" Header="Blue Spheres..." IsEnabled="False">
-                    <MenuItem Header="Sonic" Name="RefrenceBSSonicButton" Click="RefrenceAnimationButton_Click"></MenuItem>
-                    <MenuItem Header="Tails" Name="RefrenceBSTailsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
-                    <MenuItem Header="Knuckles" Name="RefrenceBSKnucklesButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                <MenuItem Name="MiscRefrence" Header="Misc..." IsEnabled="False">
+                    <MenuItem Header="Monitors"  Name="RefrenceMonitorsButton" Click="RefrenceAnimationButton_Click"></MenuItem>
+                    <MenuItem Header="HUD" Name="RefrenceHUDButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="HUD" IsEnabled="False" Name="RefrenceHUDButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                 <MenuItem Visibility="Visible" Header="Custom..." Name="CustomRefrenceButton" Click="CustomRefrenceButton_Click"></MenuItem>
                 <MenuItem IsChecked="True" Header="None (Default)" Name="RefrenceNothingButton" Click="RefrenceAnimationButton_Click"></MenuItem>
                 <Separator></Separator>
                 <MenuItem Header="Set Refrence Folder Path..." Name="SetRefrenecFolderPath" Click="SetRefreneceFolderPath_Click"></MenuItem>
                 <Separator></Separator>
                 <MenuItem IsEnabled="False" Header="Default Location in A.I.R. Install: &#10;(sonic3air__game\doc\modding\sprites)" Name="RefrenceNoteItem"/>
-                <StackPanel Width="180" IsEnabled="True" Margin="0,5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <StackPanel Width="280" IsEnabled="True" Margin="0,5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                     <TextBlock Foreground="{DynamicResource DisabledText}" Text="Current Refrence Folder: " TextWrapping="Wrap" ></TextBlock>
                     <TextBox Height="25" VerticalContentAlignment="Center" Foreground="{DynamicResource DisabledText}" IsReadOnly="True" Text="N/A" Name="RefrenceFolderPathLabel">
                         <TextBox.ToolTip>
@@ -80,8 +90,6 @@
                         </TextBox.ToolTip>
                     </TextBox>
                 </StackPanel>
-
-
             </MenuItem>
             <MenuItem Header="Options">
                 <MenuItem Header="Use Dark Mode" Name="DarkModeButton" Click="DarkModeButton_Click"></MenuItem>
@@ -105,20 +113,45 @@
                     <RowDefinition></RowDefinition>
                     <RowDefinition Height="30"></RowDefinition>
                 </Grid.RowDefinitions>
-                <ListBox Name="FrameViewer" Style="{DynamicResource BaseListBoxStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="FrameViewer_SelectionChanged">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"></VirtualizingStackPanel>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Image Width="45" Height="45" Source="{Binding FrameImage}" HorizontalAlignment="Center"></Image>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <TabControl TabStripPlacement="Top" Margin="0,-7,0,0" Name="FrameViewerTabControl" SelectionChanged="FrameViewerTabControl_SelectionChanged">
+                    <TabItem Name="FrameViewerTab">
+                        <TabItem.Header>
+                            <TextBlock Visibility="Collapsed"></TextBlock>
+                        </TabItem.Header>
+                        <ListBox Margin="-2" Name="FrameViewer" Style="{DynamicResource BaseListBoxStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="FrameViewer_SelectionChanged">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"></VirtualizingStackPanel>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Image Width="45" Height="45" Source="{Binding FrameImage}" HorizontalAlignment="Center"></Image>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+                    <TabItem Name="RefrenceFrameViewerTab">
+                        <ListBox  Margin="-2" Name="RefrenceFrameViewer" Visibility="Visible" Style="{DynamicResource BaseListBoxStyle}" ScrollViewer.VerticalScrollBarVisibility="Disabled" SelectionChanged="RefrenceFrameViewer_SelectionChanged">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal"></VirtualizingStackPanel>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Image Width="45" Height="45" Source="{Binding FrameImage}" HorizontalAlignment="Center"></Image>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </TabItem>
+                </TabControl>
+
+
                 <StackPanel Grid.Row="1" Background="{DynamicResource NormalBackground}">
                     <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Width="42" Height="30" HorizontalAlignment="Left">
                         <ScrollBar Grid.Column="1" Orientation="Horizontal" Width="40" Height="28" x:Name="AnimationScroller" ValueChanged="AnimationScroller_ValueChanged" SmallChange="1" Value="2" Maximum="3" Minimum="0"/>
@@ -129,32 +162,41 @@
 
             </Grid>
             <Grid Grid.Column="0" Grid.RowSpan="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition Height="30"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="30"></RowDefinition>
-                    </Grid.RowDefinitions>
-                </Grid>
-                <ListBox Name="EntriesList" HorizontalContentAlignment="Left"  Style="{DynamicResource BaseListBoxStyle}" ItemContainerStyle="{DynamicResource BaseListBoxItemStyle}" SelectionChanged="EntriesList_SelectionChanged" SelectionMode="Single" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
-                <Button Grid.Row="1" IsEnabled="False"></Button>
-                <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
-                    <Button Name="MoveUpButton" Width="30" Height="30" Margin="0 0 0 0" Content="↑" Click="MoveUpButton_Click"></Button>
-                    <Button Name="MoveDownButton" Width="30" Height="30" Margin="0 0 0 0" Content="↓" Click="MoveDownButton_Click"></Button>
-                    <Button Name="AddButton" Width="30" Height="30" Margin="0 0 0 0" Content="+" Click="AddButton_Click"></Button>
-                    <Button Name="RemoveButton" Width="30" Height="30" Margin="0 0 0 0" Content="-" Click="RemoveButton_Click"></Button>
-                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
-                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
-                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
-                    <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
-                </StackPanel>
+                <TabControl Name="AnimationTabControl" SelectionChanged="AnimationTabControl_SelectionChanged">
+                    <TabItem Header="Working Animation" Name="WorkingAnimationTab">
+                        <Grid Margin="-2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition Height="30"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition Height="30"></RowDefinition>
+                                </Grid.RowDefinitions>
+                            </Grid>
+                            <ListBox Name="EntriesList" HorizontalContentAlignment="Left"  Style="{DynamicResource BaseListBoxStyle}" ItemContainerStyle="{DynamicResource BaseListBoxItemStyle}" SelectionChanged="EntriesList_SelectionChanged" SelectionMode="Single" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
+                            <Button Grid.Row="1" IsEnabled="False"></Button>
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Left">
+                                <Button Name="MoveUpButton" Width="30" Height="30" Margin="0 0 0 0" Content="↑" Click="MoveUpButton_Click"></Button>
+                                <Button Name="MoveDownButton" Width="30" Height="30" Margin="0 0 0 0" Content="↓" Click="MoveDownButton_Click"></Button>
+                                <Button Name="AddButton" Width="30" Height="30" Margin="0 0 0 0" Content="+" Click="AddButton_Click"></Button>
+                                <Button Name="RemoveButton" Width="30" Height="30" Margin="0 0 0 0" Content="-" Click="RemoveButton_Click"></Button>
+                                <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                                <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                                <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                                <Button Width="30" Height="30" IsEnabled="False" Margin="0 0 0 0"></Button>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Refrence Animation">
+                        <ListBox Name="RefrenceEntriesList" HorizontalContentAlignment="Left"  Style="{DynamicResource BaseListBoxStyle}" ItemContainerStyle="{DynamicResource BaseListBoxItemStyle}" SelectionChanged="RefrenceEntriesList_SelectionChanged" SelectionMode="Single" KeyboardNavigation.DirectionalNavigation="Contained"></ListBox>
+                    </TabItem>
+                </TabControl>
             </Grid>
-            <Grid  Grid.Column="3" Grid.RowSpan="3" Margin="5">
+            <ScrollViewer Grid.Column="3" Grid.RowSpan="3" Margin="0">
                 <StackPanel>
-                    <GroupBox Margin="5,0" Header="Refrence Image Opacity:" Foreground="{DynamicResource NormalText}">
+                    <Expander IsExpanded="True" Margin="5,0" Header="Frame Properties:" Foreground="{DynamicResource NormalText}">
                         <StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -221,56 +263,126 @@
                                 </Grid>
                             </Grid>
                         </StackPanel>
-                    </GroupBox>
+                    </Expander>
+                    <Expander Margin="5,0" Header="Refrence Frame Properties:" Foreground="{DynamicResource NormalText}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalAlignment="Right" Content="Width:"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="1" IsManipulationEnabled="True" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="RefrenceWidthNUD"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Height:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Margin="5" Name="RefrenceHeightNUD" Grid.Row="1"></wpfTool:IntegerUpDown>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label HorizontalAlignment="Right" Content="X:"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="RefrenceXNUD" Margin="5" Grid.Row="1"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Y:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Name="RefrenceYNUD" Margin="5" Grid.Row="1"></wpfTool:IntegerUpDown>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="A"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Label HorizontalAlignment="Right" Content="Center X:"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="1" HorizontalAlignment="Stretch" Width="Auto" Name="RefrenceCenterXNUD" Margin="5" Grid.Row="0"></wpfTool:IntegerUpDown>
+                                <Label HorizontalAlignment="Right" Content="Center Y:" Grid.Column="2"></Label>
+                                <wpfTool:IntegerUpDown IsReadOnly="True" Grid.Column="3" HorizontalAlignment="Stretch" Width="Auto" Name="RefrenceCenterYNUD" Margin="5" Grid.Row="0"></wpfTool:IntegerUpDown>
+                                <Label Margin="5,0" HorizontalAlignment="Right" Grid.Row="1" Content="Name:" Grid.Column="0"></Label>
+                                <Label Margin="5,0" HorizontalAlignment="Right" Content="File:" Grid.Row="2" Grid.Column="0"></Label>
 
-                    <GroupBox x:Name="RefrenceOpacityLabel" Margin="5,0" Header="Refrence Image Opacity:" Foreground="{DynamicResource NormalText}">
-                        <Slider Margin="5,0" IsEnabled="False" Grid.Row="1" Maximum="99" Minimum="0" Value="100" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
-                    </GroupBox>
-                    <GroupBox Margin="5,0" Header="Viewer Colors" Foreground="{DynamicResource NormalText}">
-                        <Grid Margin="5,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition Width="30"></ColumnDefinition>
-                                <ColumnDefinition Width="30"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Separator Grid.Column="0" Padding="0" Margin="0,0,5,0"></Separator>
-                            <Label Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Main" Padding="0"></Label>
-                            <Label Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Ref." Padding="0"></Label>
-
-                            <Label Grid.Column="0" Grid.Row="1" Content="Frame Background:"></Label>
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBGColorPick" Grid.Column="1" Grid.Row="1" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <Label Grid.Column="0" Grid.Row="2" Content="Frame Border:"></Label>
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBorderColorPick" Grid.Row="2" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <Label Grid.Column="0" Grid.Row="3" Content="Image Background:"></Label>
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgBGColorPick" Grid.Row="3" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1" SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="3" Grid.Row="1" x:Name="RefImgFrameBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Row="2" x:Name="RefImgFrameBorderColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="2"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="RefImgBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Row="3" Grid.Column="2"  SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
-
-                            <Label Grid.Column="0" Grid.Row="4" Content="Axis Lines:"></Label>
-                            <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="1" Grid.Row="4" x:Name="AlignmentLinesColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Red" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+                                <Grid Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="1">
+                                    <TextBox IsReadOnly="True" Margin="5,0" Name="RefrenceNameTextBox" Grid.Row="0" Height="20" Grid.Column="0"></TextBox>
+                                </Grid>
+                                <Grid Grid.Column="1" Grid.ColumnSpan="4" Grid.Row="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition Width="25"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox IsReadOnly="True" Margin="5,0,0,0" Name="RefrenceFileTextBox" Grid.Row="1" Height="20" Grid.Column="0"></TextBox>
+                                    <Button IsEnabled="False" x:Name="RefrenceFileSpriteSelectButton" Margin="0,3,5,3" Content="..." Grid.Column="1">
+                                        <Button.ContextMenu>
+                                            <ContextMenu Style="{DynamicResource DefaultContextMenuStyle}" Name="RefrenceSpriteSheetFileList"></ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
 
 
-                        </Grid>
-                    </GroupBox>
+                    <Expander Margin="5,0" Header="Viewer Options" Foreground="{DynamicResource NormalText}">
+                        <StackPanel>
+                            <GroupBox x:Name="RefrenceOpacityLabel" Margin="5,0" Header="Refrence Image Opacity:" Foreground="{DynamicResource NormalText}">
+                                <Slider Margin="5,0" IsEnabled="False" Grid.Row="1" Maximum="99" Minimum="0" Value="100" Name="OpacitySlider" ValueChanged="OpacitySlider_ValueChanged"></Slider>
+                            </GroupBox>
+                            <Grid Margin="5,5,5,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition Width="30"></ColumnDefinition>
+                                    <ColumnDefinition Width="30"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <Separator Grid.Column="0" Padding="0" Margin="0,0,5,0"></Separator>
+                                <Label Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Main" Padding="0"></Label>
+                                <Label Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Content="Ref." Padding="0"></Label>
+
+                                <Label Grid.Column="0" Grid.Row="1" Content="Frame Background:"></Label>
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBGColorPick" Grid.Column="1" Grid.Row="1" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <Label Grid.Column="0" Grid.Row="2" Content="Frame Border:"></Label>
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgFrameBorderColorPick" Grid.Row="2" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <Label Grid.Column="0" Grid.Row="3" Content="Image Background:"></Label>
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="ImgBGColorPick" Grid.Row="3" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="1" SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="3" Grid.Row="1" x:Name="RefImgFrameBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Transparent" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Row="2" x:Name="RefImgFrameBorderColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Column="2"  SelectedColor="Black" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" x:Name="RefImgBGColorPick" ShowTabHeaders="False" ShowDropDownButton="False" Grid.Row="3" Grid.Column="2"  SelectedColor="White" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+
+                                <Label Grid.Column="0" Grid.Row="4" Content="Axis Lines:"></Label>
+                                <wpfTool:ColorPicker Style="{DynamicResource ColorPicker}" Grid.Column="1" Grid.Row="4" x:Name="AlignmentLinesColorPick" ShowTabHeaders="False" ShowDropDownButton="False"  SelectedColor="Red" SelectedColorChanged="ColorPick_SelectedColorChanged"></wpfTool:ColorPicker>
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
+
 
 
 
                 </StackPanel>
-            </Grid>
+            </ScrollViewer>
             <Border BorderThickness="1" BorderBrush="{DynamicResource ButtonBorder}" Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="1">
                 <Grid MouseWheel="CanvasView_MouseWheel">
                     <Grid Background="#303030" MouseWheel="CanvasView_MouseWheel">
@@ -374,6 +486,27 @@
                                 </ToggleButton>
 
                                 <Separator  Margin="3 0 3 0" Style="{DynamicResource {x:Static ToolBar.SeparatorStyleKey}}" Visibility="Visible" />
+
+                                <ToggleButton IsEnabled="False" IsChecked="True" x:Name="ButtonAutoPickRefrenceFrame" Click="ButtonAutoPickRefrenceFrame_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Automatically pick a refrence frame that matches the main frame's key name"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource NewFile_16x}"/>
+                                </ToggleButton>
+                                <ToggleButton IsEnabled="False" IsChecked="False" x:Name="ButtonRefrenceFrameBehind" Click="ButtonRefrenceFrameBehind_Click">
+                                    <ToggleButton.ToolTip>
+                                        <ToolTip Background="{DynamicResource NormalBackground}">
+                                            <StackPanel Background="{DynamicResource NormalBackground}">
+                                                <Label Content="Draw Refrence Frames First (Before the Main Animation's Frames)"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToggleButton.ToolTip>
+                                    <Image Width="16" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,1,0,0" Source="{DynamicResource Copy_16x}"/>
+                                </ToggleButton>
 
                                 <Button Width="20" Height="20" Content="?" x:Name="ButtonHelp" Click="ButtonHelp_Click" Visibility="Collapsed">
                                     <Button.ContextMenu>

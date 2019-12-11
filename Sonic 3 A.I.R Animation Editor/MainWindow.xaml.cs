@@ -44,6 +44,8 @@ namespace Sonic_3_AIR_Animation_Editor
         public bool ShowSolidImageBackground = false;
         public bool ForceCenterFrame = false;
         public bool ShowOnlyRefrenceSection = false;
+        public bool AutoPickRefrenceFrame = true;
+        public bool RenderRefrenceFrameFirst = false;
         #endregion
 
         #region Animations and Bitmaps
@@ -154,6 +156,7 @@ namespace Sonic_3_AIR_Animation_Editor
         private void UpdateUI()
         {
             bool isAnimationLoaded = CurrentAnimation != null;
+            bool isRefAnimationLoaded = CurrentRefrenceAnimation != null;
             OpenMenuItem.IsEnabled = true;
             SaveAsMenuItem.IsEnabled = isAnimationLoaded;
             SaveMenuItem.IsEnabled = isAnimationLoaded;
@@ -173,9 +176,12 @@ namespace Sonic_3_AIR_Animation_Editor
                 FrameViewer.ItemsSource = CurrentAnimation.FrameList;
                 UpdateFrameViewAndValues();
             }
-            else
+            if (isRefAnimationLoaded)
             {
-
+                RefrenceEntriesList.ItemsSource = null;
+                RefrenceEntriesList.ItemsSource = CurrentRefrenceAnimation.FrameList;
+                RefrenceFrameViewer.ItemsSource = null;
+                RefrenceFrameViewer.ItemsSource = CurrentRefrenceAnimation.FrameList;
             }
 
         }
@@ -349,7 +355,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
         #region Values
 
-        public FrameValues UpdateRefrenceValues(bool NewFrame = false)
+        public FrameValues UpdateValuesForRefrence(bool NewFrame = false)
         {
             int img_width = (CurrentRefrenceSpriteSheet != null ? CurrentRefrenceSpriteSheet.Width : int.MaxValue);
             int img_height = (CurrentRefrenceSpriteSheet != null ? CurrentRefrenceSpriteSheet.Height : int.MaxValue);
@@ -456,6 +462,32 @@ namespace Sonic_3_AIR_Animation_Editor
             AllowUpdate = true;
         }
 
+        public void UpdateRefrenceValues()
+        {
+            Program.Log.InfoFormat("Setting Editor Control Values from Refrence Animation Entry...");
+            RefrenceNameTextBox.Text = CurrentRefrenceFrame.Name;
+            RefrenceFileTextBox.Text = CurrentRefrenceFrame.File;
+
+            RefrenceYNUD.Maximum = int.MaxValue;
+            RefrenceXNUD.Maximum = int.MaxValue;
+            RefrenceWidthNUD.Maximum = int.MaxValue;
+            RefrenceHeightNUD.Maximum = int.MaxValue;
+
+            RefrenceYNUD.Value = CurrentRefrenceFrame.Y;
+            RefrenceXNUD.Value = CurrentRefrenceFrame.X;
+            RefrenceWidthNUD.Value = CurrentRefrenceFrame.Width;
+            RefrenceHeightNUD.Value = CurrentRefrenceFrame.Height;
+
+            RefrenceCenterXNUD.Value = CurrentRefrenceFrame.CenterX;
+            RefrenceCenterYNUD.Value = CurrentRefrenceFrame.CenterY;
+
+            RefrenceCenterXNUD.Minimum = int.MinValue;
+            RefrenceCenterXNUD.Maximum = int.MaxValue;
+
+            RefrenceCenterYNUD.Minimum = int.MinValue;
+            RefrenceCenterYNUD.Maximum = int.MaxValue;
+        }
+
         public void VoidValues()
         {
             Program.Log.InfoFormat("Voiding Editor Control Values...");
@@ -476,6 +508,26 @@ namespace Sonic_3_AIR_Animation_Editor
             CenterXNUD.Value = 0;
             CenterYNUD.Value = 0;
             AllowUpdate = true;
+        }
+
+        public void VoidRefrenceValues()
+        {
+            Program.Log.InfoFormat("Voiding Refrence Control Values...");
+            RefrenceNameTextBox.Text = "";
+            RefrenceFileTextBox.Text = "";
+
+            RefrenceYNUD.Maximum = 0;
+            RefrenceXNUD.Maximum = 0;
+            RefrenceWidthNUD.Maximum = 0;
+            RefrenceHeightNUD.Maximum = 0;
+
+            RefrenceYNUD.Value = 0;
+            RefrenceXNUD.Value = 0;
+            RefrenceWidthNUD.Value = 0;
+            RefrenceHeightNUD.Value = 0;
+
+            RefrenceCenterXNUD.Value = 0;
+            RefrenceCenterYNUD.Value = 0;
         }
 
         private Rect GetCOBRAF(int x, int y, int width, int height, int imageWidth, int imageHeight)
@@ -561,9 +613,10 @@ namespace Sonic_3_AIR_Animation_Editor
                 AllowListViewUpdate = false;
                 EntriesList.SelectedIndex = CurrentAnimation.FrameList.IndexOf(CurrentFrame);
                 FrameViewer.SelectedIndex = CurrentAnimation.FrameList.IndexOf(CurrentFrame);
+
                 AllowListViewUpdate = true;
 
-                UpdateOpacitySlider();
+                UpdateRefrenceControls();
 
                 UpdateFrameImage();
 
@@ -578,36 +631,36 @@ namespace Sonic_3_AIR_Animation_Editor
 
         }
 
-        private void UpdateRefrenceSelect()
+        private void UpdateRefrenceControls()
         {
-            bool enabled = Directory.Exists(RefrenceFolderPath);
-            StandardRefrence.IsEnabled = enabled;
-            BSRefrence.IsEnabled = enabled;
-            RefrenceHUDButton.IsEnabled = enabled;
-
-            if (RefrenceFolderPath != "")
-            {
-                RefrenceFolderPathLabel.Text = RefrenceFolderPath;
-            }
-            else RefrenceFolderPathLabel.Text = "N/A";
-
-            RefrenceFolderPathLabelTooltip.Text = RefrenceFolderPathLabel.Text;
-        }
-
-        private void UpdateOpacitySlider()
-        {
-            if (CurrentRefrenceAnimation != null) CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
+            if (CurrentRefrenceAnimation != null) RefrenceSelectionChanged();
 
             if (CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null)
             {
                 if (OpacitySlider.IsEnabled == false) OpacitySlider.IsEnabled = true;
                 if (RefrenceOpacityLabel.IsEnabled == false) RefrenceOpacityLabel.IsEnabled = true;
-
+                UpdateRefrenceValues();
             }
             else
             {
                 OpacitySlider.IsEnabled = false;
                 RefrenceOpacityLabel.IsEnabled = false;
+                VoidRefrenceValues();
+            }
+
+            if (CurrentRefrenceAnimation != null)
+            {
+                ButtonAutoPickRefrenceFrame.IsEnabled = true;
+                AutoPickRefrenceFramesMenuItem.IsEnabled = true;
+                ButtonRefrenceFrameBehind.IsEnabled = true;
+                RefrenceFrameBehindMenuItem.IsEnabled = true;
+            }
+            else
+            {
+                ButtonAutoPickRefrenceFrame.IsEnabled = false;
+                AutoPickRefrenceFramesMenuItem.IsEnabled = false;
+                ButtonRefrenceFrameBehind.IsEnabled = false;
+                RefrenceFrameBehindMenuItem.IsEnabled = false;
             }
         }
 
@@ -652,7 +705,7 @@ namespace Sonic_3_AIR_Animation_Editor
 
             void DrawRefrence()
             {
-                FrameValues refValues = UpdateRefrenceValues(NewFrame);
+                FrameValues refValues = UpdateValuesForRefrence(NewFrame);
                 if (refValues.Width != 0 && refValues.Height != 0 && CurrentRefrenceSpriteSheet != null)
                 {
                     try
@@ -838,24 +891,69 @@ namespace Sonic_3_AIR_Animation_Editor
             {
                 AllowListViewUpdate = false;
                 FrameViewer.SelectedItem = EntriesList.SelectedItem;
-                EntriesList.ScrollIntoView(EntriesList.SelectedItem);
-                FrameViewer.ScrollIntoView(EntriesList.SelectedItem);
-                CurrentFrame = EntriesList.SelectedItem as Animation.Anim.Frame;
-                if (CurrentRefrenceAnimation != null) CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
+                SelectionChanged();
                 UpdateFrameViewAndValues(true);
                 AllowListViewUpdate = true;
             }
         }
+
+        private void RefrenceEntriesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RefrenceEntriesList.SelectedItem != null && AllowListViewUpdate)
+            {
+                AllowListViewUpdate = false;
+                RefrenceFrameViewer.SelectedItem = RefrenceEntriesList.SelectedItem;
+                RefrenceSelectionChanged();
+                UpdateFrameViewAndValues(true);
+                AllowListViewUpdate = true;
+            }
+        }
+
+        private void SelectionChanged()
+        {
+            CurrentFrame = EntriesList.SelectedItem as Animation.Anim.Frame;
+            EntriesList.ScrollIntoView(EntriesList.SelectedItem);
+            FrameViewer.ScrollIntoView(EntriesList.SelectedItem);
+
+        }
+
+        private void RefrenceSelectionChanged(bool isFrameViewer = false)
+        {
+            if (isFrameViewer) CurrentRefrenceFrame = RefrenceFrameViewer.SelectedItem as Animation.Anim.Frame;
+            else CurrentRefrenceFrame = RefrenceEntriesList.SelectedItem as Animation.Anim.Frame;
+
+
+            if (AutoPickRefrenceFrame && CurrentFrame != null)
+            {
+                CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
+
+                RefrenceEntriesList.SelectedItem = CurrentRefrenceFrame;
+                RefrenceFrameViewer.SelectedItem = CurrentRefrenceFrame;
+            }
+
+            RefrenceEntriesList.ScrollIntoView(RefrenceEntriesList.SelectedItem);
+            RefrenceFrameViewer.ScrollIntoView(RefrenceEntriesList.SelectedItem);
+        }
+
         private void FrameViewer_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (FrameViewer.SelectedItem != null && AllowListViewUpdate)
             {
                 AllowListViewUpdate = false;
                 EntriesList.SelectedItem = FrameViewer.SelectedItem;
-                EntriesList.ScrollIntoView(EntriesList.SelectedItem);
-                FrameViewer.ScrollIntoView(EntriesList.SelectedItem);
-                CurrentFrame = EntriesList.SelectedItem as Animation.Anim.Frame;
-                if (CurrentRefrenceAnimation != null) CurrentRefrenceFrame = CurrentRefrenceAnimation.FrameList.Where(x => x.Name == CurrentFrame.Name).FirstOrDefault();
+                SelectionChanged();
+                UpdateFrameViewAndValues(true);
+                AllowListViewUpdate = true;
+            }
+        }
+
+        private void RefrenceFrameViewer_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RefrenceFrameViewer.SelectedItem != null && AllowListViewUpdate)
+            {
+                AllowListViewUpdate = false;
+                RefrenceEntriesList.SelectedItem = RefrenceFrameViewer.SelectedItem;
+                RefrenceSelectionChanged(true);
                 UpdateFrameViewAndValues(true);
                 AllowListViewUpdate = true;
             }
@@ -1162,9 +1260,17 @@ namespace Sonic_3_AIR_Animation_Editor
             if (CurrentSpriteSheet != null || CurrentSpriteSheetFrame != null)
             {
 
-
-                DrawSprite(canvas, width_half, height_half, width, height);
-                if (CurrentRefrenceSpriteSheet != null && CurrentRefrenceSpriteSheetFrame != null && CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null) DrawRefrenceSprite(canvas, width_half, height_half, width, height);
+                if (RenderRefrenceFrameFirst)
+                {
+                    Draw(true);
+                    Draw();
+                }
+                else
+                {
+                    Draw();
+                    Draw(true);
+                }
+                
 
                 if (ShowAlignmentLines)
                 {
@@ -1177,6 +1283,18 @@ namespace Sonic_3_AIR_Animation_Editor
 
                     canvas.DrawLine(x1, y1, new SkiaSharp.SKPaint() { Color = SkiaSharp.Views.WPF.WPFExtensions.ToSKColor(AlignmentLinesColor) });
                     canvas.DrawLine(x2, y2, new SkiaSharp.SKPaint() { Color = SkiaSharp.Views.WPF.WPFExtensions.ToSKColor(AlignmentLinesColor) });
+                }
+            }
+
+            void Draw(bool isRefrence = false)
+            {
+                if (isRefrence)
+                {
+                    if (CurrentRefrenceSpriteSheet != null && CurrentRefrenceSpriteSheetFrame != null && CurrentRefrenceAnimation != null && CurrentRefrenceFrame != null) DrawRefrenceSprite(canvas, width_half, height_half, width, height);
+                }
+                else
+                {
+                    DrawSprite(canvas, width_half, height_half, width, height);
                 }
             }
         }
@@ -1503,6 +1621,51 @@ namespace Sonic_3_AIR_Animation_Editor
             UpdateFrameViewAndValues();
         }
 
+        private void ButtonAutoPickRefrenceFrame_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsInitialized)
+            {
+                AutoPickRefrenceFramesMenuItem.IsChecked = !AutoPickRefrenceFramesMenuItem.IsChecked;
+                AutoPickRefrenceFramesMenuItem_Checked(null, null);
+            }
+        }
+
+        private void AutoPickRefrenceFramesMenuItem_Checked(object sender, RoutedEventArgs e)
+        {
+            if(IsInitialized)
+            {
+                if (AutoPickRefrenceFramesMenuItem.IsChecked) AutoPickRefrenceFrame = true;
+                else AutoPickRefrenceFrame = false;
+
+                ButtonAutoPickRefrenceFrame.IsChecked = AutoPickRefrenceFrame;
+
+                UpdateFrameViewAndValues();
+            }
+
+        }
+
+        private void ButtonRefrenceFrameBehind_Click(object sender, RoutedEventArgs e)
+        {
+            if (IsInitialized)
+            {
+                RefrenceFrameBehindMenuItem.IsChecked = !RefrenceFrameBehindMenuItem.IsChecked;
+                RefrenceFrameBehindMenuItem_Checked(null, null);
+            }
+        }
+
+        private void RefrenceFrameBehindMenuItem_Checked(object sender, RoutedEventArgs e)
+        {
+            if (IsInitialized)
+            {
+                if (RefrenceFrameBehindMenuItem.IsChecked) RenderRefrenceFrameFirst = true;
+                else RenderRefrenceFrameFirst = false;
+
+                ButtonRefrenceFrameBehind.IsChecked = RenderRefrenceFrameFirst;
+
+                UpdateFrameViewAndValues();
+            }
+        }
+
 
         #endregion
 
@@ -1566,6 +1729,21 @@ namespace Sonic_3_AIR_Animation_Editor
 
         #region Refrence Frames Methods
 
+        private void UpdateRefrenceSelect()
+        {
+            bool enabled = Directory.Exists(RefrenceFolderPath);
+            StandardRefrence.IsEnabled = enabled;
+            MiscRefrence.IsEnabled = enabled;
+
+            if (RefrenceFolderPath != "")
+            {
+                RefrenceFolderPathLabel.Text = RefrenceFolderPath;
+            }
+            else RefrenceFolderPathLabel.Text = "N/A";
+
+            RefrenceFolderPathLabelTooltip.Text = RefrenceFolderPathLabel.Text;
+        }
+
         private void CustomRefrenceButton_Click(object sender, RoutedEventArgs e)
         {
             string appdata = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -1594,11 +1772,14 @@ namespace Sonic_3_AIR_Animation_Editor
             RefrenceSonicDropDashButton.IsChecked = false;
             RefrenceSuperSonicButton.IsChecked = false;
             RefrenceTailsButton.IsChecked = false;
+            RefrenceTailsTailsButton.IsChecked = false;
             RefrenceKnucklesButton.IsChecked = false;
             RefrenceBSSonicButton.IsChecked = false;
             RefrenceBSTailsButton.IsChecked = false;
+            RefrenceBSTailsTailsButton.IsChecked = false;
             RefrenceBSKnucklesButton.IsChecked = false;
             RefrenceHUDButton.IsChecked = false;
+            RefrenceMonitorsButton.IsChecked = false;
             CustomRefrenceButton.IsChecked = false;
             RefrenceNothingButton.IsChecked = false;
 
@@ -1617,10 +1798,13 @@ namespace Sonic_3_AIR_Animation_Editor
             else if (sender.Equals(RefrenceSonicDropDashButton)) item = "character_sonic_dropdash.json";
             else if (sender.Equals(RefrenceSuperSonicButton)) item = "character_supersonic.json";
             else if (sender.Equals(RefrenceTailsButton)) item = "character_tails.json";
+            else if (sender.Equals(RefrenceTailsTailsButton)) item = "character_tails_tails.json";
             else if (sender.Equals(RefrenceKnucklesButton)) item = "character_knuckles.json";
             else if (sender.Equals(RefrenceBSSonicButton)) item = "bluesphere_sonic.json";
             else if (sender.Equals(RefrenceBSTailsButton)) item = "bluesphere_tails.json";
+            else if (sender.Equals(RefrenceBSTailsTailsButton)) item = "bluesphere_tails_tails.json";
             else if (sender.Equals(RefrenceBSKnucklesButton)) item = "bluesphere_knuckles.json";
+            else if (sender.Equals(RefrenceMonitorsButton)) item = "monitors.json";
             else if (sender.Equals(RefrenceHUDButton)) item = "hud_sprites.json";
             else if (sender.Equals(RefrenceNothingButton)) item = "NULL";
             else item = "NULL";
@@ -1640,6 +1824,7 @@ namespace Sonic_3_AIR_Animation_Editor
                 UpdateFrameViewAndValues();
             }
 
+            UpdateUI();
             UpdateRefrenceCheckBoxes(sender);
             CanvasView.InvalidateVisual();
 
@@ -1723,6 +1908,15 @@ namespace Sonic_3_AIR_Animation_Editor
         }
 
         #endregion
+
+        private void AnimationTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+             FrameViewerTabControl.SelectedIndex = AnimationTabControl.SelectedIndex;
+        }
+        private void FrameViewerTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 
 
