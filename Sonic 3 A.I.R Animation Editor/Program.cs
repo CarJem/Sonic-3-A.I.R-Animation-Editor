@@ -110,8 +110,9 @@ namespace Sonic_3_AIR_Animation_Editor
 
         static void CleanUpLogsFolder()
         {
-            string app_log_filepath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "app.log");
-            string log_folder_location = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "Logs");
+            string appdatafolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "//Sonic 3 A.I.R. Animation Editor";
+            string app_log_filepath = Path.Combine(appdatafolder, "app.log");
+            string log_folder_location = Path.Combine(appdatafolder, "Logs");
 
             if (!Directory.Exists(log_folder_location)) Directory.CreateDirectory(log_folder_location);
 
